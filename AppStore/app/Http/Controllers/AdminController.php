@@ -81,4 +81,43 @@ class AdminController extends Controller
     {
         //
     }
+    
+    public function addCategory(Request $request)
+    {
+        if (isset($request->category)) {
+            $category = $request->category;
+            $count = categorys::where( //查看資料庫內是否有相同分類
+                'category',
+                '=',
+                $category
+            )->count();
+            if ($count === 0) {
+                $categoryName = $request->category;
+                categorys::insert(['category' => $categoryName]);
+                return response()->json(["boolean" => "True"]);
+            } else return response()->json(["boolean" => "False"]);
+        }
+    }
+    
+    //上傳icon
+    public function iconUp(Request $request)
+    {
+        $icon = $request->file('imgs');
+        $extension = strtolower($icon->getClientOriginalExtension()); //副檔名轉小寫
+        return $extension;
+        if (
+            $extension == 'png' || $extension == 'jpeg' ||
+            $extension == 'jpg' || $extension == 'gif'
+        ) {
+            $file_name = date('ymdHisu') . '.' . $extension;
+            // $file_name = time(). '.' . $extension;
+            $path = Storage::putFileAs('public/icon', $icon, $file_name);
+            if ($icon->isValid()) {
+                imgs::insert(
+                    ['imgData' => $path,]
+                );
+            }
+            return response()->json(["boolean" => "True"]);
+        } else return response()->json(["boolean" => "False"]);
+    }
 }
