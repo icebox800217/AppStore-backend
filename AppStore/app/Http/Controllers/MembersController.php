@@ -30,7 +30,7 @@ class MembersController extends Controller
      */
     public function create()
     {
-        return $member;
+        //   return $member;
     }
 
     /**
