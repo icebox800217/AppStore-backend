@@ -15,6 +15,8 @@ class MembersMiddleware
      */
     public function handle($request, Closure $next)
     {
-        return $next($request);
+       $level = Session::get('level');
+        if (Session::has('name') && $level >= 1)
+            return $next($request);
     }
 }
