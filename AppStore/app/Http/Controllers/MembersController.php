@@ -103,4 +103,34 @@ class MembersController extends Controller
     {
         //
     }
+    
+    public function login(Request $request)
+    {
+        if (isset($request->email) && isset($request->password)) {
+            $email = $request->email;
+            $password = md5($request->password);
+            $count = Members::where([
+                ['email', '=', $email], ['password', '=', $password]
+            ])->count();
+            if ($count > 0) {
+                $data = Members::where([
+                    ['email', '=', $email], ['password', '=', $password]
+                ])->firstOrFail();
+
+                session::put('name', $data->name);
+                session::put('level', $data->level);
+
+                $right = $data->right; //確認是否被停權
+
+                if ($right === 1) {
+                    $memberinfo = $data->join('imgs', 'members.imgId', '=', 'imgs.Id')
+                        ->select('members.name', 'members.level', 'imgs.url')->firstOrFail();
+                    session::put('icon', $memberinfo->url);
+                    return $memberinfo;
+                } else {
+                    return response()->json(["boolean" => "False"]);
+                }
+            } else return  response()->json(["boolean" => "False"]);
+        }
+    }
 }
