@@ -25,7 +25,8 @@ class CreateMembersTable extends Migration
             $table->boolean('right')->default(1);
             $table->integer('imgId')->unsigned()->default(1);
             $table->foreign('imgId')->references('id')->on('member_imgs');
-            $table->timestamps();
+            $table->timestamp('created_at')->default(DB::raw('CURRENT_TIMESTAMP'));
+            $table->timestamp('updated_at')->default(DB::raw('CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP'));
         });
     }
 
