@@ -3,10 +3,10 @@
 namespace App\Http\Controllers;
 use App\Apps;
 use App\AppImgs;
-use App\members;
+use App\Members;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Session;
+
 
 class DevelopController extends Controller
 {
