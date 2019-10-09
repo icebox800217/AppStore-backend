@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use Illuminate\Support\Facades\Storage;
 use App\MemberImgs;
 use Illuminate\Http\Request;
@@ -82,7 +83,7 @@ class AdminController extends Controller
     {
         //
     }
-    
+
     public function addCategory(Request $request)
     {
         if (isset($request->category)) {
@@ -99,13 +100,12 @@ class AdminController extends Controller
             } else return response()->json(["boolean" => "False"]);
         }
     }
-    
+
     //管理員新增會員頭像
     public function newIcon(Request $request)
     {
         $icon = $request->file('imgs');
         $extension = strtolower($icon->getClientOriginalExtension()); //副檔名轉小寫
-        // return $extension;
         if (
             $extension === 'png' || $extension === 'jpeg' ||
             $extension === 'jpg' || $extension === 'gif'
