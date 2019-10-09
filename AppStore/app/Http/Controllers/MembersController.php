@@ -12,7 +12,7 @@ class MembersController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    //顯示會員
+    //顯示所有會員
      public function getAllMember(Members $member)
         {
         return response()->json(Members::all(),200);
@@ -24,29 +24,19 @@ class MembersController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //   return $member;
-    }
-
-    /**
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    //申請會員
-    public function store(Request $request)
+    //創建新會員
+    public function newMember(Request $request)
     {
         $this->validate($request, [
             'name' => 'required|string',
             'phone' => ['required', 'regex:/^09\d{8}$/'],
             'email' => 'required|email',
-            'idNumber' => ['required', 'regex:/^[A-Z]\d{9}$/'],
+            'idNumber' => ['required', 'regex:/^[A-Z][1,2]\d{8}$/'],
             'password' => ['required', 'regex:/[0-9A-Za-z]/', 'min:8', 'max:12'],
         ]);
 
@@ -59,16 +49,7 @@ class MembersController extends Controller
         ]);
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Members $member): MembersResource
-    {
-        return new MembersResource($member);
-    }
+
 
     /**
      * Show the form for editing the specified resource.
@@ -93,16 +74,40 @@ class MembersController extends Controller
         //
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
+    //會員登入
+    public function login(Request $request)
     {
-        //
+        if (isset($request->email) && isset($request->password)) {
+            $email = $request->email;
+            $password = md5($request->password);
+            $count = Members::where([
+                ['email', '=', $email], ['password', '=', $password]
+            ])->count();
+            if ($count > 0) {
+                $data = Members::where([
+                    ['email', '=', $email], ['password', '=', $password]
+                ])->firstOrFail();
+
+                session::put('name', $data->name);
+                session::put('level', $data->level);
+
+                $right = $data->right; //確認是否被停權
+
+                if ($right === 1) {
+                    $memberinfo = $data->join('imgs', 'members.imgId', '=', 'imgs.Id')
+                        ->select('members.name', 'members.level', 'imgs.url')->firstOrFail();
+                    session::put('icon', $memberinfo->url);
+                    return $memberinfo;
+                } else {
+                    return response()->json(["boolean" => "False"]);
+                }
+            } else return  response()->json(["boolean" => "False"]);
+        }
     }
-    
-    
+
+    //會員登出
+    public function logout()
+    {
+        Session::flush();
+    }
 }
