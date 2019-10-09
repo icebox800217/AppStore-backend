@@ -1,7 +1,8 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use Illuminate\Support\Facades\Storage;
+use App\MemberImgs;
 use Illuminate\Http\Request;
 
 class AdminController extends Controller
@@ -99,22 +100,22 @@ class AdminController extends Controller
         }
     }
     
-    //上傳icon
-    public function iconUp(Request $request)
+    //管理員新增會員頭像
+    public function newIcon(Request $request)
     {
         $icon = $request->file('imgs');
         $extension = strtolower($icon->getClientOriginalExtension()); //副檔名轉小寫
-        return $extension;
+        // return $extension;
         if (
-            $extension == 'png' || $extension == 'jpeg' ||
-            $extension == 'jpg' || $extension == 'gif'
+            $extension === 'png' || $extension === 'jpeg' ||
+            $extension === 'jpg' || $extension === 'gif'
         ) {
             $file_name = date('ymdHisu') . '.' . $extension;
             // $file_name = time(). '.' . $extension;
             $path = Storage::putFileAs('public/icon', $icon, $file_name);
             if ($icon->isValid()) {
-                imgs::insert(
-                    ['imgData' => $path,]
+                MemberImgs::insert(
+                    ['img' => $path,]
                 );
             }
             return response()->json(["boolean" => "True"]);
