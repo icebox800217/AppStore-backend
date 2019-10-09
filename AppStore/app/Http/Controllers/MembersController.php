@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 use App\Members;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Session;
 
 
 class MembersController extends Controller
@@ -34,9 +35,9 @@ class MembersController extends Controller
     {
         $this->validate($request, [
             'name' => 'required|string',
-            'phone' => ['required', 'regex:/^09\d{8}$/'],
-            'email' => 'required|email',
-            'idNumber' => ['required', 'regex:/^[A-Z][1,2]\d{8}$/'],
+            'phone' => ['required', 'regex:/^09\d{8}$/', 'unique:members'],
+            'email' => 'required|email|unique:members',
+            'idNumber' => ['required', 'regex:/^[A-Z][1,2]\d{8}$/', 'unique:members'],
             'password' => ['required', 'regex:/[0-9A-Za-z]/', 'min:8', 'max:12'],
         ]);
 
@@ -94,8 +95,8 @@ class MembersController extends Controller
                 $right = $data->right; //確認是否被停權
 
                 if ($right === 1) {
-                    $memberinfo = $data->join('imgs', 'members.imgId', '=', 'imgs.Id')
-                        ->select('members.name', 'members.level', 'imgs.url')->firstOrFail();
+                    $memberinfo = $data->join('member_imgs', 'members.imgId', '=', 'member_imgs.Id')
+                        ->select('members.name', 'members.level', 'member_imgs.url')->firstOrFail();
                     session::put('icon', $memberinfo->url);
                     return $memberinfo;
                 } else {
