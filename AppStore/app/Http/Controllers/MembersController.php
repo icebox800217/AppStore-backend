@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use App\Members;
 use Illuminate\Http\Request;
 
@@ -13,13 +14,13 @@ class MembersController extends Controller
      * @return \Illuminate\Http\Response
      */
     //顯示所有會員
-     public function getAllMember(Members $member)
-        {
-        return response()->json(Members::all(),200);
+    public function getAllMember(Members $member)
+    {
+        return response()->json(Members::all(), 200);
     }
     //顯示特定會員
     public function getMember(Members $id)
-        {
+    {
         return $id;
     }
 
@@ -34,9 +35,9 @@ class MembersController extends Controller
     {
         $this->validate($request, [
             'name' => 'required|string',
-            'phone' => ['required', 'regex:/^09\d{8}$/'],
-            'email' => 'required|email',
-            'idNumber' => ['required', 'regex:/^[A-Z][1,2]\d{8}$/'],
+            'phone' => ['required', 'regex:/^09\d{8}$/', 'unique:members'],
+            'email' => 'required|email|unique:members',
+            'idNumber' => ['required', 'regex:/^[A-Z][1,2]\d{8}$/', 'unique:members'],
             'password' => ['required', 'regex:/[0-9A-Za-z]/', 'min:8', 'max:12'],
         ]);
 

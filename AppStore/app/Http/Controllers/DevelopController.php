@@ -1,7 +1,10 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use App\Apps;
+use App\AppImgs;
+use App\members;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Http\Request;
 
 class DevelopController extends Controller
