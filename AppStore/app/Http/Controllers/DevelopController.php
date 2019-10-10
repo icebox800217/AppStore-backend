@@ -69,7 +69,7 @@ class DevelopController extends Controller
                         'changelog' => $request->changelog,
                         'fileURL' => $path,
                     ]);
-                    return response()->json(["boolean" => "True"]);
+                    return response()->json(["isSuccess" => "True"]);
                 } else if ($extension == 'ipa') {
                     $path = Storage::putFileAs('public/file/ios', $file, $file_name);
                     apps::insert([
@@ -85,8 +85,8 @@ class DevelopController extends Controller
                         'changelog' => $request->changelog,
                         'fileURL' => $path,
                     ]);
-                    return response()->json(["boolean" => "True"]);
-                } else return response()->json(["boolean" => "False"]);
+                    return response()->json(["isSuccess" => "True"]);
+                } else return response()->json(["isSuccess" => "False"]);
             }
         }
     }

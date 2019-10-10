@@ -49,6 +49,7 @@ class MembersController extends Controller
             'idNumber' => $request->idNumber,
             'password' => md5($request->password),
         ]);
+        return response()->json(["isSuccess" => "True"]);
     }
 
 
@@ -102,9 +103,9 @@ class MembersController extends Controller
                     session::put('icon', $memberinfo->url);
                     return $memberinfo;
                 } else {
-                    return response()->json(["boolean" => "False"]);
+                    return response()->json(["isSuccess" => "False"]);
                 }
-            } else return  response()->json(["boolean" => "False"]);
+            } else return  response()->json(["isSuccess" => "False"]);
         }
     }
 

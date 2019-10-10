@@ -28,5 +28,8 @@ Route::POST('/logout', 'MembersController@logout');
 route::POST('/Admin/newIcon', 'AdminController@newIcon');
 //管理員新增會員頭像
 
-Route::PUT('/Admin/{id}','AdminController@infoUpdate');
 
+//修改密碼
+Route::PUT('/Admin/{id}','AdminController@pwdChange');
+
+Route::GET('/Admin/appCheck','AdminController@appCheck');

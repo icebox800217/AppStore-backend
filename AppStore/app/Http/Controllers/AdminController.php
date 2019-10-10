@@ -1,10 +1,12 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use Illuminate\Support\Facades\Storage;
 use App\MemberImgs;
 use Illuminate\Http\Request;
 use App\Members;
+use App\Apps;
 
 class AdminController extends Controller
 {
@@ -68,7 +70,9 @@ class AdminController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function infoUpdate(Members $member,Request $request, $id)
+
+    //修改密碼(待討論是否可以修改Name)
+    public function pwdChange(Members $member, Request $request, $id)
     {
         $this->validate($request, [
             'name' => 'required|string',
@@ -79,12 +83,12 @@ class AdminController extends Controller
         // $id = session::get('member_id');
         $oldPwd = md5($request->oldPwd);
         $count = Members::where([
-            ['id', '=', $id], ['password', '=', $oldPwd ]
+            ['id', '=', $id], ['password', '=', $oldPwd]
         ])->count();
-        if($count === 1){
+        if ($count === 1) {
             Members::find($id)->update(['password' => md5($request->newPwd)]);
-            return response()->json(["boolean" => "True"]);
-        } else return response()->json(["boolean" => "False"]); 
+            return response()->json(["isSuccess" => "True"]);
+        } else return response()->json(["isSuccess" => "False"]);
     }
 
     /**
@@ -110,8 +114,8 @@ class AdminController extends Controller
             if ($count === 0) {
                 $categoryName = $request->category;
                 categorys::insert(['category' => $categoryName]);
-                return response()->json(["boolean" => "True"]);
-            } else return response()->json(["boolean" => "False"]);
+                return response()->json(["isSuccess" => "True"]);
+            } else return response()->json(["isSuccess" => "False"]);
         }
     }
 
@@ -132,7 +136,17 @@ class AdminController extends Controller
                     ['img' => $path,]
                 );
             }
-            return response()->json(["boolean" => "True"]);
-        } else return response()->json(["boolean" => "False"]);
+            return response()->json(["isSuccess" => "True"]);
+        } else return response()->json(["isSuccess" => "False"]);
+    }
+
+    //列出全部未審核的app
+    public function appCheck()
+    {
+        $list = Apps::where('apps.verify', '=', 3)
+            ->join('members', 'members.Id', '=', 'apps.memberId')
+            ->select('apps.Name', 'apps.summary', 'members.name', 'apps.created_at')
+            ->get();
+        return $list;
     }
 }
