@@ -1,10 +1,10 @@
 <?php
 
 namespace App\Http\Controllers;
-
 use Illuminate\Support\Facades\Storage;
 use App\MemberImgs;
 use Illuminate\Http\Request;
+use App\Members;
 
 class AdminController extends Controller
 {
@@ -68,9 +68,23 @@ class AdminController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function infoUpdate(Members $member,Request $request, $id)
     {
-        //
+        $this->validate($request, [
+            'name' => 'required|string',
+            'oldPwd' => ['required', 'regex:/[0-9A-Za-z]/', 'min:8', 'max:12'],
+            'newPwd' => ['required', 'regex:/[0-9A-Za-z]/', 'min:8', 'max:12'],
+            'pwdCheck' => ['required', 'same:newPwd'],
+        ]);
+        // $id = session::get('member_id');
+        $oldPwd = md5($request->oldPwd);
+        $count = Members::where([
+            ['id', '=', $id], ['password', '=', $oldPwd ]
+        ])->count();
+        if($count === 1){
+            Members::find($id)->update(['password' => md5($request->newPwd)]);
+            return response()->json(["boolean" => "True"]);
+        } else return response()->json(["boolean" => "False"]); 
     }
 
     /**

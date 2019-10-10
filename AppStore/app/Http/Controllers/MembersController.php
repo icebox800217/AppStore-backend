@@ -92,6 +92,7 @@ class MembersController extends Controller
 
                 session::put('name', $data->name);
                 session::put('level', $data->level);
+                session::put('member_id',$data->id);
 
                 $right = $data->right; //確認是否被停權
 

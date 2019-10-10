@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdminController;
 use Illuminate\Http\Request;
 use App\Member;
 /*
@@ -20,9 +21,12 @@ Route::GET('/member/{id}', 'MembersController@getMember');
 //顯示特定會員
 route::POST('/member', 'MembersController@newMember');
 //創建新會員
-Route::POST('/login','MembersController@login');
+Route::POST('/login', 'MembersController@login');
 //登入會員
-Route::POST('/logout','MembersController@logout');
+Route::POST('/logout', 'MembersController@logout');
 //登出會員
 route::POST('/Admin/newIcon', 'AdminController@newIcon');
 //管理員新增會員頭像
+
+Route::PUT('/Admin/{id}','AdminController@infoUpdate');
+
