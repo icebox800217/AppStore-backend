@@ -34,7 +34,8 @@ route::POST('/Admin/newIcon', 'AdminController@newIcon');
 Route::PUT('/Admin/{id}','AdminController@pwdChange');
 //列出未審核app
 Route::GET('/Admin/appCheck','AdminController@appCheck');
+//列出未審核之開發者申請
+Route::GET('/Admin/devCheck','AdminController@devCheck');
 //計算未審app數、未審開發人員數 及 列出下載量前五名的app
 Route::GET('/Admin/countAll','AdminController@countAll');
-//未審核app-開發者搜尋
-Route::POST('/Admin/searchMember','AdminController@searchMember');
+

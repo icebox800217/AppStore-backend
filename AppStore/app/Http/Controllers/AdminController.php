@@ -149,6 +149,14 @@ class AdminController extends Controller
             ->get();
     }
 
+    //列出未審核之開發者申請
+    public function devCheck()
+    {
+        return Members::where('verify', '=', 0)
+            ->select('name', 'updated_at')
+            ->get();
+    }
+
     //管理者首頁 - 計算未審app數、未審開發人員數 及 列出下載量前五名的app
     public function countAll()
     {
