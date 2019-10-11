@@ -143,10 +143,18 @@ class AdminController extends Controller
     //列出全部未審核的app
     public function appCheck()
     {
-        $list = Apps::where('apps.verify', '=', 3)
+        return Apps::where('apps.verify', '=', 3)
             ->join('members', 'members.Id', '=', 'apps.memberId')
             ->select('apps.Name', 'apps.summary', 'members.name', 'apps.created_at')
             ->get();
-        return $list;
+    }
+
+    //管理者首頁 - 計算未審app數、未審開發人員數 及 列出下載量前五名的app
+    public function countAll()
+    {
+        $unCheck_app_count = Apps::where('verify', '=', 3)->count();
+        $unCheck_dev_Count = Members::where('verify', '=', 0)->count();
+        $top5dowload =Apps::orderBy('downloadTimes', 'desc')->take(5)->pluck('Name');
+        return response(['appCount' => $unCheck_app_count, 'devCount' => $unCheck_dev_Count,'top5'=>$top5dowload]);
     }
 }
