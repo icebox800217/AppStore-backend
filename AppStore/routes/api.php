@@ -38,4 +38,7 @@ Route::GET('/Admin/appCheck','AdminController@appCheck');
 Route::GET('/Admin/devCheck','AdminController@devCheck');
 //計算未審app數、未審開發人員數 及 列出下載量前五名的app
 Route::GET('/Admin/countAll','AdminController@countAll');
-
+//App審核通過 
+Route::PUT('/Admin/appCheckOk/{id}','AdminController@appCheckOk');
+//App審核失敗-退回 
+Route::PUT('/Admin/appGoBack/{id}','AdminController@appGoBack');

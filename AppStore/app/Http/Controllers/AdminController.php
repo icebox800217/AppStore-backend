@@ -74,6 +74,7 @@ class AdminController extends Controller
     //修改密碼(待討論是否可以修改Name)
     public function pwdChange(Members $member, Request $request, $id)
     {
+
         $this->validate($request, [
             'name' => 'required|string',
             'oldPwd' => ['required', 'regex:/[0-9A-Za-z]/', 'min:8', 'max:12'],
@@ -86,7 +87,7 @@ class AdminController extends Controller
             ['id', '=', $id], ['password', '=', $oldPwd]
         ])->count();
         if ($count === 1) {
-            Members::find($id)->update(['password' => md5($request->newPwd)]);
+            Members::where('id', '=', $id)->update(['password' => md5($request->newPwd)]);
             return response()->json(["isSuccess" => "True"]);
         } else return response()->json(["isSuccess" => "False"]);
     }
@@ -102,6 +103,7 @@ class AdminController extends Controller
         //
     }
 
+    //新增分類
     public function addCategory(Request $request)
     {
         if (isset($request->category)) {
@@ -145,7 +147,7 @@ class AdminController extends Controller
     {
         return Apps::where('apps.verify', '=', 3)
             ->join('members', 'members.Id', '=', 'apps.memberId')
-            ->select('apps.id','apps.Name', 'apps.summary', 'members.name', 'apps.created_at')
+            ->select('apps.id', 'apps.Name', 'apps.summary', 'members.name', 'apps.created_at')
             ->get();
     }
 
@@ -153,7 +155,7 @@ class AdminController extends Controller
     public function devCheck()
     {
         return Members::where('verify', '=', 0)
-            ->select('name', 'updated_at')
+            ->select('id', 'name', 'updated_at')
             ->get();
     }
 
@@ -162,7 +164,32 @@ class AdminController extends Controller
     {
         $unCheck_app_count = Apps::where('verify', '=', 3)->count();
         $unCheck_dev_Count = Members::where('verify', '=', 0)->count();
-        $top5dowload =Apps::orderBy('downloadTimes', 'desc')->take(5)->pluck('Name');
-        return response(['appCount' => $unCheck_app_count, 'devCount' => $unCheck_dev_Count,'top5'=>$top5dowload]);
+        $top5dowload = Apps::orderBy('downloadTimes', 'desc')->take(5)->pluck('Name');
+        return response(['appCount' => $unCheck_app_count, 'devCount' => $unCheck_dev_Count, 'top5' => $top5dowload]);
+    }
+
+    //App審核通過 (並return剩餘未審核)
+    public function appCheckOk($id)
+    {
+        $count = Apps::where('id', '=', $id)->count();
+        if ($count === 1) {
+            Apps::where('id', '=', $id)->update(['verify' => 1]);
+            return Apps::where('apps.verify', '=', 3)
+                ->join('members', 'members.id', '=', 'apps.memberId')
+                ->select('apps.id', 'apps.Name', 'apps.summary', 'members.name', 'apps.created_at')
+                ->get();
+        } else return response()->json(["isSuccess" => "False"]);
+    }
+    //App審核失敗-退回
+    public function appGoBack($id)
+    {
+        $count = Apps::where('id', '=', $id)->count();
+        if ($count === 1) {
+            Apps::where('id', '=', $id)->update(['verify' => 2]);
+            return Apps::where('apps.verify', '=', 3)
+                ->join('members', 'members.id', '=', 'apps.memberId')
+                ->select('apps.id', 'apps.Name', 'apps.summary', 'members.name', 'apps.created_at')
+                ->get();
+        } else return response()->json(["isSuccess" => "False"]);
     }
 }
