@@ -71,9 +71,19 @@ class MembersController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    //會員修改
+    public function update(Members $member, Request $request, $id)
     {
-        //
+        $this->validate($request, [
+            'name' => 'string',
+            'phone' => ['regex:/^09\d{8}$/', 'unique:members'],
+            'email' => 'email|unique:members',
+            'idNumber' => ['regex:/^[A-Z][1,2]\d{8}$/', 'unique:members'],
+            'password' => ['regex:/[0-9A-Za-z]/', 'min:8', 'max:12'],
+        ]);
+
+        Members::whereId($id)->update($request->all());
+        return response()->json(["boolean" => "True"]);
     }
 
     //會員登入
@@ -96,8 +106,8 @@ class MembersController extends Controller
                 $right = $data->right; //確認是否被停權
 
                 if ($right === 1) {
-                    $memberinfo = $data->join('member_imgs', 'members.imgId', '=', 'member_imgs.Id')
-                        ->select('members.name', 'members.level', 'member_imgs.url')->firstOrFail();
+                    $memberinfo = $data->join('member_imgs', 'members.imgId', '=', 'member_imgs.id')
+                        ->select('members.name', 'members.level', 'member_imgs.img')->firstOrFail();
                     session::put('icon', $memberinfo->url);
                     return $memberinfo;
                 } else {

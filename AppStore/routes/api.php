@@ -20,6 +20,8 @@ Route::GET('/member/{id}', 'MembersController@getMember');
 //顯示特定會員
 route::POST('/member', 'MembersController@newMember');
 //創建新會員
+route::PUT('/member/{id}', 'MembersController@update');
+//修改會員資料
 Route::POST('/login','MembersController@login');
 //登入會員
 Route::POST('/logout','MembersController@logout');
