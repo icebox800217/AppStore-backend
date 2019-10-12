@@ -145,7 +145,7 @@ class AdminController extends Controller
     {
         return Apps::where('apps.verify', '=', 3)
             ->join('members', 'members.Id', '=', 'apps.memberId')
-            ->select('apps.Name', 'apps.summary', 'members.name', 'apps.created_at')
+            ->select('apps.id','apps.Name', 'apps.summary', 'members.name', 'apps.created_at')
             ->get();
     }
 

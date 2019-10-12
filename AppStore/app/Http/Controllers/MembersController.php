@@ -89,17 +89,14 @@ class MembersController extends Controller
             if ($count > 0) {
                 $data = Members::where([
                     ['email', '=', $email], ['password', '=', $password]
-                ])->firstOrFail();
+                ])->join('imgs', 'members.imgId', '=', 'imgs.Id');
 
-                session::put('name', $data->name);
-                session::put('level', $data->level);
-                session::put('member_id',$data->id);
-
-                $right = $data->right; //確認是否被停權
-
+                $right = $data->firstOrFail()->right; //確認是否被停權
                 if ($right === 1) {
-                    $memberinfo = $data->join('member_imgs', 'members.imgId', '=', 'member_imgs.Id')
-                        ->select('members.name', 'members.level', 'member_imgs.url')->firstOrFail();
+                    $memberinfo =  $data->select('members.id', 'name', 'level', 'url')->firstOrFail();
+                    session::put('name', $memberinfo->name);
+                    session::put('level', $memberinfo->level);
+                    session::put('member_id', $memberinfo->id);
                     session::put('icon', $memberinfo->url);
                     return $memberinfo;
                 } else {
