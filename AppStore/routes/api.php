@@ -57,5 +57,9 @@ Route::PUT('/Admin/devCheckOk/{id}','AdminController@devCheckOk');
 //開發者審核失敗-退回 
 Route::PUT('/Admin/devGoBack/{id}','AdminController@devGoBack');
 
+//App管理
+Route::GET('/Admin/appManage','AdminController@appManage');
+//會員管理
+Route::GET('/Admin/memberManage','AdminController@memberManage');
 //新增分類
 route::POST('/Admin/category', 'AdminController@addCategory');

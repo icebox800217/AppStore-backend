@@ -75,7 +75,7 @@ class AdminController extends Controller
     //修改密碼(待討論是否可以修改Name)
     public function pwdChange(Members $member, Request $request, $id)
     {
-       
+
         $this->validate($request, [
             'name' => 'required|string',
             'oldPwd' => ['required', 'regex:/[0-9A-Za-z]/', 'min:8', 'max:12'],
@@ -198,12 +198,13 @@ class AdminController extends Controller
     {
         $count = Members::where('id', '=', $id)->count();
         if ($count === 1) {
-            Members::where('id', '=', $id)->update(['verify' => 1]);
+            Members::where('id', '=', $id)->update(['verify' => 1, 'level' => 2]);
             return Members::where('verify', '=', 0)
                 ->select('id', 'name', 'updated_at')
                 ->get();
         } else return response()->json(["isSuccess" => "False"]);
     }
+
     //開發者審核失敗-退回
     public function devGoBack($id)
     {
@@ -214,5 +215,26 @@ class AdminController extends Controller
                 ->select('id', 'name', 'updated_at')
                 ->get();
         } else return response()->json(["isSuccess" => "False"]);
+    }
+
+    //會員管理
+    public function memberManage()
+    {
+        $count = Members::count();
+        $List = Members::where('level', '<', 3)->select('id', 'name', 'phone', 'email', 'level')->get();
+        for ($i = 0; $i < $count; $i++) {
+            if ($List[$i]->level === 2) //開發者
+                $List[$i]->level = '是';
+            else if ($List[$i]->level === 1)
+                $List[$i]->level = '否';
+        }
+        return $List;
+    }
+
+    //App管理
+    public function appManage()
+    {
+        return Apps::select('id', 'appName', 'summary', 'device')
+            ->get();
     }
 }
