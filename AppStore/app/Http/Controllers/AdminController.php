@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Categories;
 use Illuminate\Support\Facades\Storage;
 use App\MemberImgs;
 use Illuminate\Http\Request;
@@ -106,20 +107,16 @@ class AdminController extends Controller
     //新增分類
     public function addCategory(Request $request)
     {
+        $this->validate($request, [
+            'category' => 'required|string|unique:categories',
+        ]);
         if (isset($request->category)) {
             $category = $request->category;
-            $count = categorys::where( //查看資料庫內是否有相同分類
-                'category',
-                '=',
-                $category
-            )->count();
-            if ($count === 0) {
-                $categoryName = $request->category;
-                categorys::insert(['category' => $categoryName]);
-                return response()->json(["isSuccess" => "True"]);
-            } else return response()->json(["isSuccess" => "False"]);
-        }
+            Categories::insert(['category' => $category]);
+            return response()->json(["isSuccess" => "True"]);
+        } else return response()->json(["isSuccess" => "False"]);
     }
+
 
     //管理員新增會員頭像
     public function newIcon(Request $request)
@@ -132,7 +129,7 @@ class AdminController extends Controller
         ) {
             $file_name = date('ymdHisu') . '.' . $extension;
             // $file_name = time(). '.' . $extension;
-            $path = Storage::putFileAs('public/icon', $icon, $file_name);
+            $path = Storage::putFileAs('public/Member_icon', $icon, $file_name);
             if ($icon->isValid()) {
                 MemberImgs::insert(
                     ['img' => $path,]
@@ -146,8 +143,8 @@ class AdminController extends Controller
     public function appCheck()
     {
         return Apps::where('apps.verify', '=', 3)
-            ->join('members', 'members.Id', '=', 'apps.memberId')
-            ->select('apps.id', 'apps.Name', 'apps.summary', 'members.name', 'apps.created_at')
+            ->join('members', 'members.id', '=', 'apps.memberId')
+            ->select('apps.id', 'apps.appName', 'apps.summary', 'members.name', 'apps.created_at')
             ->get();
     }
 
@@ -160,15 +157,17 @@ class AdminController extends Controller
     }
 
     //管理者首頁 - 計算未審app數、未審開發人員數 及 列出下載量前五名的app
+    //前端接口為appCount、devCount、top5
     public function countAll()
     {
         $unCheck_app_count = Apps::where('verify', '=', 3)->count();
         $unCheck_dev_Count = Members::where('verify', '=', 0)->count();
-        $top5dowload = Apps::orderBy('downloadTimes', 'desc')->take(5)->pluck('Name');
+        $top5dowload = Apps::orderBy('downloadTimes', 'desc')->take(5)->pluck('appName');
         return response(['appCount' => $unCheck_app_count, 'devCount' => $unCheck_dev_Count, 'top5' => $top5dowload]);
     }
 
-    //App審核通過 (並return剩餘未審核)
+    //App審核通過 (並return剩餘未審核) 
+    //回傳欄位名有修改請告知前端
     public function appCheckOk($id)
     {
         $count = Apps::where('id', '=', $id)->count();
@@ -176,7 +175,7 @@ class AdminController extends Controller
             Apps::where('id', '=', $id)->update(['verify' => 1]);
             return Apps::where('apps.verify', '=', 3)
                 ->join('members', 'members.id', '=', 'apps.memberId')
-                ->select('apps.id', 'apps.Name', 'apps.summary', 'members.name', 'apps.created_at')
+                ->select('apps.id', 'apps.appName', 'apps.summary', 'members.name', 'apps.created_at')
                 ->get();
         } else return response()->json(["isSuccess" => "False"]);
     }
@@ -188,7 +187,7 @@ class AdminController extends Controller
             Apps::where('id', '=', $id)->update(['verify' => 2]);
             return Apps::where('apps.verify', '=', 3)
                 ->join('members', 'members.id', '=', 'apps.memberId')
-                ->select('apps.id', 'apps.Name', 'apps.summary', 'members.name', 'apps.created_at')
+                ->select('apps.id', 'apps.appName', 'apps.summary', 'members.name', 'apps.created_at')
                 ->get();
         } else return response()->json(["isSuccess" => "False"]);
     }

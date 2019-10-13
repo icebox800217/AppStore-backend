@@ -15,7 +15,7 @@ class CreateMemberImgsTable extends Migration
     {
         Schema::create('member_imgs', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('img');
+            $table->string('img')->unique();
             $table->timestamp('created_at')->default(DB::raw('CURRENT_TIMESTAMP'));
             $table->timestamp('updated_at')->default(DB::raw('CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP'));
         });

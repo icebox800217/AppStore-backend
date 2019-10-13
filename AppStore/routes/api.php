@@ -28,6 +28,11 @@ Route::POST('/logout', 'MembersController@logout');
 route::POST('/Admin/newIcon', 'AdminController@newIcon');
 //管理員新增會員頭像
 
+//////////////////////////////////////////////////////////////////
+route::POST('/develop/upload', 'DevelopController@appUp');
+
+//新增分類
+route::POST('/Admin/category', 'AdminController@addCategory');
 
 //林林的管理者畫面
 //修改密碼

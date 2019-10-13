@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use App\MemberImgs;
 use App\Members;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
@@ -89,15 +89,16 @@ class MembersController extends Controller
             if ($count > 0) {
                 $data = Members::where([
                     ['email', '=', $email], ['password', '=', $password]
-                ])->join('imgs', 'members.imgId', '=', 'imgs.Id');
+                ])->join('member_imgs', 'members.imgId', '=', 'member_imgs.Id');
 
                 $right = $data->firstOrFail()->right; //確認是否被停權
                 if ($right === 1) {
-                    $memberinfo =  $data->select('members.id', 'name', 'level', 'url')->firstOrFail();
+                    $memberinfo =  $data->select('members.id', 'name', 'level', 'img')->firstOrFail();
+                    session::put('memberId', $memberinfo->id);
                     session::put('name', $memberinfo->name);
                     session::put('level', $memberinfo->level);
-                    session::put('member_id', $memberinfo->id);
                     session::put('icon', $memberinfo->url);
+                    
                     return $memberinfo;
                 } else {
                     return response()->json(["isSuccess" => "False"]);
