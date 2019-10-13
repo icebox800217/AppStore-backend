@@ -148,14 +148,6 @@ class AdminController extends Controller
             ->get();
     }
 
-    //列出未審核之開發者申請
-    public function devCheck()
-    {
-        return Members::where('verify', '=', 0)
-            ->select('id', 'name', 'updated_at')
-            ->get();
-    }
-
     //管理者首頁 - 計算未審app數、未審開發人員數 及 列出下載量前五名的app
     //前端接口為appCount、devCount、top5
     public function countAll()
@@ -188,6 +180,38 @@ class AdminController extends Controller
             return Apps::where('apps.verify', '=', 3)
                 ->join('members', 'members.id', '=', 'apps.memberId')
                 ->select('apps.id', 'apps.appName', 'apps.summary', 'members.name', 'apps.created_at')
+                ->get();
+        } else return response()->json(["isSuccess" => "False"]);
+    }
+
+    //列出未審核之開發者申請
+    public function devCheck()
+    {
+        return Members::where('verify', '=', 0)
+            ->select('id', 'name', 'updated_at')
+            ->get();
+    }
+
+    //開發者審核通過 (並return剩餘未審核) 
+    //回傳欄位名有修改請告知前端
+    public function devCheckOk($id)
+    {
+        $count = Members::where('id', '=', $id)->count();
+        if ($count === 1) {
+            Members::where('id', '=', $id)->update(['verify' => 1]);
+            return Members::where('verify', '=', 0)
+                ->select('id', 'name', 'updated_at')
+                ->get();
+        } else return response()->json(["isSuccess" => "False"]);
+    }
+    //開發者審核失敗-退回
+    public function devGoBack($id)
+    {
+        $count = Members::where('id', '=', $id)->count();
+        if ($count === 1) {
+            Members::where('id', '=', $id)->update(['verify' => null]);
+            return Members::where('verify', '=', 0)
+                ->select('id', 'name', 'updated_at')
                 ->get();
         } else return response()->json(["isSuccess" => "False"]);
     }
