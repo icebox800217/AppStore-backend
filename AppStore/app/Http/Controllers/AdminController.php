@@ -75,7 +75,7 @@ class AdminController extends Controller
     //修改密碼(待討論是否可以修改Name)
     public function pwdChange(Members $member, Request $request, $id)
     {
-
+       
         $this->validate($request, [
             'name' => 'required|string',
             'oldPwd' => ['required', 'regex:/[0-9A-Za-z]/', 'min:8', 'max:12'],

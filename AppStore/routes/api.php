@@ -29,11 +29,15 @@ route::POST('/Admin/newIcon', 'AdminController@newIcon');
 //管理員新增會員頭像
 
 //////////////////////////////////////////////////////////////////
-route::POST('/develop/upload', 'DevelopController@appUp');
+//砲台哥的開發者畫面
+//上傳App
+Route::POST('/develop/upload', 'DevelopController@appUp');
+//列出該開發者自己的App download Rank
+Route::GET('/develop/appRank/{id}','DevelopController@appRank');
+//自己開發的所有App列表(含審核狀態)
+Route::GET('/develop/appList/{id}','DevelopController@appList');
 
-//新增分類
-route::POST('/Admin/category', 'AdminController@addCategory');
-
+//////////////////////////////////////////////////////////////////
 //林林的管理者畫面
 //計算未審app數、未審開發人員數 及 列出下載量前五名的app
 Route::GET('/Admin/countAll','AdminController@countAll');
@@ -52,3 +56,6 @@ Route::GET('/Admin/devCheck','AdminController@devCheck');
 Route::PUT('/Admin/devCheckOk/{id}','AdminController@devCheckOk');
 //開發者審核失敗-退回 
 Route::PUT('/Admin/devGoBack/{id}','AdminController@devGoBack');
+
+//新增分類
+route::POST('/Admin/category', 'AdminController@addCategory');
