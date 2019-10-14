@@ -25,8 +25,7 @@ Route::POST('/login', 'MembersController@login');
 //登入會員
 Route::POST('/logout', 'MembersController@logout');
 //登出會員
-route::POST('/Admin/newIcon', 'AdminController@newIcon');
-//管理員新增會員頭像
+
 
 //////////////////////////////////////////////////////////////////
 //砲台哥的開發者畫面
@@ -75,3 +74,6 @@ Route::PUT('/Admin/restoreApp/{id}', 'AdminController@restoreApp');
 
 //新增開發者
 Route::POST('/Admin/newDeveloper', 'AdminController@newDeveloper');
+
+route::POST('/Admin/newIcon', 'AdminController@newIcon');
+//管理員新增會員頭像

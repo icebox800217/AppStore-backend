@@ -24,7 +24,7 @@ class DevelopController extends Controller
                 $icon_extension === 'jpg' || $icon_extension === 'gif'
             ) {
                 $icon_name = time() . rand(100000, 999999) . '.' . $icon_extension;
-                $icon_path = Storage::putFileAs('public/icon', $icon, $icon_name);
+                $icon_path = Storage::putFileAs('icon', $icon, $icon_name);
             } else return response()->json(["isSuccess" => "False", "reason" => "icon extension error"]);
             $file = $request->file('file');
             $file_extension = $file->getClientOriginalExtension();
@@ -40,7 +40,7 @@ class DevelopController extends Controller
                     'changelog' => 'required|string',  //更新異動
                 ]);
                 if ($file_extension === 'apk') {
-                    $filepath = Storage::putFileAs('public/file/android', $file, $file_name);
+                    $filepath = Storage::putFileAs('file/android', $file, $file_name);
                     apps::insert([
                         'appName' => $request->appName,
                         'memberId' => $request->memberId,
@@ -55,7 +55,7 @@ class DevelopController extends Controller
                         'fileURL' => $filepath,
                     ]);
                 } else if ($file_extension === 'ipa') {
-                    $filepath = Storage::putFileAs('public/file/ios', $file, $file_name);
+                    $filepath = Storage::putFileAs('file/ios', $file, $file_name);
                     apps::insert([
                         'appName' => $request->appName,
                         'memberId' => $request->memberId,
@@ -80,7 +80,7 @@ class DevelopController extends Controller
                 $img1_extension === 'jpg' || $img1_extension === 'gif'
             ) {
                 $img1_name = time() . rand(100000, 999999) . '.' . $img1_extension;
-                $img1path = Storage::putFileAs('public/screen', $img1, $img1_name);
+                $img1path = Storage::putFileAs('screen', $img1, $img1_name);
                 AppImgs::insert(
                     [
                         'appId' => $app->id, 'screenShot' =>  $img1path,
@@ -94,7 +94,7 @@ class DevelopController extends Controller
                 $img2_extension === 'jpg' || $img2_extension === 'gif'
             ) {
                 $img2_name = time() . rand(100000, 999999) . '.' . $img2_extension;
-                $img2path = Storage::putFileAs('public/screen', $img2, $img2_name);
+                $img2path = Storage::putFileAs('screen', $img2, $img2_name);
                 AppImgs::insert(
                     [
                         'appId' => $app->id, 'screenShot' =>  $img2path,
@@ -108,8 +108,14 @@ class DevelopController extends Controller
     //自己的App排行
     public function appRank($id)
     {
-        return Apps::where('memberId', '=', $id)->orderBy('downloadTimes', 'desc')
+        // $contents = Storage::get('file.jpg');
+        $count = Apps::where('memberId', '=', $id)->count();
+        $List = Apps::where('memberId', '=', $id)->orderBy('downloadTimes', 'desc')
             ->select('id', 'appName', 'summary', 'downloadTimes', 'appIcon')->get();
+        for ($i = 0; $i < $count; $i++) {
+            $List[$i]->appIcon = asset($List[$i]->appIcon);
+        }
+        return $List;
     }
 
     //自己開發的所有App列表
