@@ -25,7 +25,7 @@ class DevelopController extends Controller
             ) {
                 $icon_name = time() . rand(100000, 999999) . '.' . $icon_extension;
                 $icon_path = Storage::putFileAs('public/icon', $icon, $icon_name);
-            } else return response()->json(["isSuccess" => "False1"]);
+            } else return response()->json(["isSuccess" => "False", "reason" => "icon extension error"]);
             $file = $request->file('file');
             $file_extension = $file->getClientOriginalExtension();
             $version = str_replace('.', '_', $request->version); //將版本的點換成底線
@@ -70,7 +70,7 @@ class DevelopController extends Controller
                         'fileURL' => $filepath,
                     ]);
                 } else return response()->json(["isSuccess" => "False2"]);
-            } else return response()->json(["isSuccess" => "False3"]);
+            } else return response()->json(["isSuccess" => "False", "reason" => "file is unvalid"]);
 
             $app = Apps::where('fileURL', $filepath)->firstOrFail();
             $img1 = $request->file('img1'); //截圖1
@@ -86,7 +86,7 @@ class DevelopController extends Controller
                         'appId' => $app->id, 'screenShot' =>  $img1path,
                     ]
                 );
-            } else return response()->json(["isSuccess" => "False4"]);
+            } else return response()->json(["isSuccess" => "False", "reason" => "img1 extension error"]);
             $img2 = $request->file('img2'); //截圖2
             $img2_extension = strtolower($img2->getClientOriginalExtension());
             if (
@@ -100,9 +100,9 @@ class DevelopController extends Controller
                         'appId' => $app->id, 'screenShot' =>  $img2path,
                     ]
                 );
-            } else return response()->json(["isSuccess" => "False5"]);
+            } else return response()->json(["isSuccess" => "False", "reason" => "img2 extension error"]);
             return response()->json(["isSuccess" => "True"]);
-        } else return response()->json(["isSuccess" => "False6"]);
+        } else return response()->json(["isSuccess" => "False", "reason" => "one of the upload is empty"]);
     }
 
     //自己的App排行

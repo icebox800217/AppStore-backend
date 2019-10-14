@@ -136,7 +136,7 @@ class AdminController extends Controller
                 );
             }
             return response()->json(["isSuccess" => "True"]);
-        } else return response()->json(["isSuccess" => "False"]);
+        } else return response()->json(["isSuccess" => "False", "reason" => "file extension error"]);
     }
 
     //列出全部未審核的app
@@ -169,7 +169,7 @@ class AdminController extends Controller
                 ->join('members', 'members.id', '=', 'apps.memberId')
                 ->select('apps.id', 'apps.appName', 'apps.summary', 'members.name', 'apps.created_at')
                 ->get();
-        } else return response()->json(["isSuccess" => "False"]);
+        } else return response()->json(["isSuccess" => "False", "reason" => "App not found"]);
     }
     //App審核失敗-退回
     public function appGoBack($id)
@@ -181,7 +181,7 @@ class AdminController extends Controller
                 ->join('members', 'members.id', '=', 'apps.memberId')
                 ->select('apps.id', 'apps.appName', 'apps.summary', 'members.name', 'apps.created_at')
                 ->get();
-        } else return response()->json(["isSuccess" => "False"]);
+        } else return response()->json(["isSuccess" => "False", "reason" => "App not found"]);
     }
 
     //列出未審核之開發者申請
@@ -202,7 +202,7 @@ class AdminController extends Controller
             return Members::where('verify', '=', 0)
                 ->select('id', 'name', 'updated_at')
                 ->get();
-        } else return response()->json(["isSuccess" => "False"]);
+        } else return response()->json(["isSuccess" => "False", "reason" => "Member not found"]);
     }
 
     //開發者審核失敗-退回
@@ -214,14 +214,14 @@ class AdminController extends Controller
             return Members::where('verify', '=', 0)
                 ->select('id', 'name', 'updated_at')
                 ->get();
-        } else return response()->json(["isSuccess" => "False"]);
+        } else return response()->json(["isSuccess" => "False", "reason" => "Member not found"]);
     }
 
     //會員管理
     public function memberManage()
     {
         $count = Members::count();
-        $List = Members::where('level', '<', 3)->select('id', 'name', 'phone', 'email', 'level')->get();
+        $List = Members::where('level', '<', 3)->select('id', 'name', 'phone', 'email', 'level', 'stopRight')->get();
         for ($i = 0; $i < $count; $i++) {
             if ($List[$i]->level === 2) //開發者
                 $List[$i]->level = '是';
@@ -234,7 +234,86 @@ class AdminController extends Controller
     //App管理
     public function appManage()
     {
-        return Apps::select('id', 'appName', 'summary', 'device')
+        return Apps::where('verify', '=', 1)->select('id', 'appName', 'summary', 'device', 'stopRight')
             ->get();
+    }
+
+    //會員停權
+    public function stopMember($id)
+    {
+        $count = Members::where([['id', '=', $id], ['stopRight', '=', 1]])->count();
+        if ($count === 1) {
+            Members::where('id', '=', $id)->update(['stopRight' => 0]);
+            $count = Members::count();
+            $List = Members::where('level', '<', 3)->select('id', 'name', 'phone', 'email', 'level', 'stopRight')->get();
+            for ($i = 0; $i < $count; $i++) {
+                if ($List[$i]->level === 2) //開發者
+                    $List[$i]->level = '是';
+                else if ($List[$i]->level === 1)
+                    $List[$i]->level = '否';
+            }
+            return $List;
+        } else return response()->json(["isSuccess" => "False", "reason" => "Member not found"]);
+    }
+
+    //會員停權恢復
+    public function restoreMember($id)
+    {
+        $count = Members::where([['id', '=', $id], ['stopRight', '=', 0]])->count();
+        if ($count === 1) {
+            Members::where('id', '=', $id)->update(['stopRight' => 1]);
+            $count = Members::count();
+            $List = Members::where('level', '<', 3)->select('id', 'name', 'phone', 'email', 'level', 'stopRight')->get();
+            for ($i = 0; $i < $count; $i++) {
+                if ($List[$i]->level === 2) //開發者
+                    $List[$i]->level = '是';
+                else if ($List[$i]->level === 1)
+                    $List[$i]->level = '否';
+            }
+            return $List;
+        } else return response()->json(["isSuccess" => "False", "reason" => "Member not found"]);
+    }
+
+    //App停權
+    public function stopApp($id)
+    {
+        $count = Apps::where([['id', '=', $id], ['stopRight', '=', 1]])->count();
+        if ($count === 1) {
+            Apps::where('id', '=', $id)->update(['stopRight' => 0]);
+            return Apps::select('id', 'appName', 'summary', 'device')->get();
+        } else return response()->json(["isSuccess" => "False", "reason" => "App not found"]);
+    }
+
+    //App停權恢復
+    public function restoreApp($id)
+    {
+        $count = Apps::where([['id', '=', $id], ['stopRight', '=', 0]])->count();
+        if ($count === 1) {
+            Apps::where('id', '=', $id)->update(['stopRight' => 1]);
+            return Apps::select('id', 'appName', 'summary', 'device')->get();
+        } else return response()->json(["isSuccess" => "False", "reason" => "App not found"]);
+    }
+
+    //新增開發者  >> 待測試 <<
+    public function newDeveloper(Request $request)
+    {
+        $this->validate($request, [
+            'name' => 'required|string',
+            'phone' => ['required', 'regex:/^09\d{8}$/', 'unique:members'],
+            'email' => 'required|email|unique:members',
+            'idNumber' => ['required', 'regex:/^[A-Z][1,2]\d{8}$/', 'unique:members'],
+            'password' => ['required', 'regex:/[0-9A-Za-z]/', 'min:8', 'max:12'],
+        ]);
+
+        Members::insert([
+            'name' => $request->name,
+            'phone' => $request->phone,
+            'email' => $request->email,
+            'idNumber' => $request->idNumber,
+            'password' => md5($request->password),
+            'level' => 2
+        ]);
+
+        return response()->json(["isSuccess" => "True"]);
     }
 }

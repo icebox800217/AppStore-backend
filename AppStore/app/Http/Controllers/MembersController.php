@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use App\MemberImgs;
 use App\Members;
 use Illuminate\Http\Request;
@@ -91,14 +92,14 @@ class MembersController extends Controller
                     ['email', '=', $email], ['password', '=', $password]
                 ])->join('member_imgs', 'members.imgId', '=', 'member_imgs.Id');
 
-                $right = $data->firstOrFail()->right; //確認是否被停權
+                $right = $data->firstOrFail()->stopRight; //確認是否被停權
                 if ($right === 1) {
                     $memberinfo =  $data->select('members.id', 'name', 'level', 'img')->firstOrFail();
                     session::put('memberId', $memberinfo->id);
                     session::put('name', $memberinfo->name);
                     session::put('level', $memberinfo->level);
                     session::put('icon', $memberinfo->url);
-                    
+
                     return $memberinfo;
                 } else {
                     return response()->json(["isSuccess" => "False"]);
