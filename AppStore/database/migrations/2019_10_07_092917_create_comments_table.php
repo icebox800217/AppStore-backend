@@ -19,7 +19,7 @@ class CreateCommentsTable extends Migration
             $table->foreign('memberId')->references('id')->on('members');
             $table->integer('appId') ->unsigned();
             $table->foreign('appId')->references('id')->on('apps');
-            $table->text('comment',255);
+            $table->string('comment',255);
             $table->tinyInteger('star')->default(0);
             $table->timestamp('created_at')->default(DB::raw('CURRENT_TIMESTAMP'));
             $table->timestamp('updated_at')->default(DB::raw('CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP'));

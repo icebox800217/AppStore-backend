@@ -22,7 +22,7 @@ class CreateMembersTable extends Migration
             $table->string('password',255);
             $table->tinyInteger('level')->default(1);
             $table->boolean('verify')->nullable();
-            $table->boolean('right')->default(1);
+            $table->boolean('permission')->default(1);
             $table->integer('imgId')->unsigned()->default(1);
             $table->foreign('imgId')->references('id')->on('member_imgs');
             $table->timestamp('created_at')->default(DB::raw('CURRENT_TIMESTAMP'));
