@@ -24,7 +24,7 @@ class DevelopController extends Controller
                 $icon_extension === 'jpg' || $icon_extension === 'gif'
             ) {
                 $icon_name = time() . rand(100000, 999999) . '.' . $icon_extension;
-                $icon_path = Storage::putFileAs('icon', $icon, $icon_name);
+                $icon_path = Storage::putFileAs('public/icon', $icon, $icon_name);
             } else return response()->json(["isSuccess" => "False", "reason" => "icon extension error"]);
             $file = $request->file('file');
             $file_extension = $file->getClientOriginalExtension();
@@ -40,34 +40,34 @@ class DevelopController extends Controller
                     'changelog' => 'required|string',  //更新異動
                 ]);
                 if ($file_extension === 'apk') {
-                    $filepath = Storage::putFileAs('file/android', $file, $file_name);
+                    $filepath = Storage::putFileAs('public/file/android', $file, $file_name);
                     apps::insert([
                         'appName' => $request->appName,
                         'memberId' => $request->memberId,
                         'summary' => $request->summary,
                         'introduction' => $request->introduction,
-                        'appIcon' => $icon_path,
+                        'appIcon' => Storage::url($icon_path),
                         'categoryId' => $request->categoryId,
                         'tags' => $request->tags,
                         'device' => 'android',
                         'version' => $request->version,
                         'changelog' => $request->changelog,
-                        'fileURL' => $filepath,
+                        'fileURL' => Storage::url($filepath),
                     ]);
                 } else if ($file_extension === 'ipa') {
-                    $filepath = Storage::putFileAs('file/ios', $file, $file_name);
+                    $filepath = Storage::putFileAs('public/file/ios', $file, $file_name);
                     apps::insert([
                         'appName' => $request->appName,
                         'memberId' => $request->memberId,
                         'summary' => $request->summary,
                         'introduction' => $request->introduction,
-                        'appIcon' => $icon_path,
+                        'appIcon' =>  Storage::url($icon_path),
                         'categoryId' => $request->categoryId,
                         'tags' => $request->tags,
                         'device' => 'ios',
                         'version' => $request->version,
                         'changelog' => $request->changelog,
-                        'fileURL' => $filepath,
+                        'fileURL' =>  Storage::url($filepath),
                     ]);
                 } else return response()->json(["isSuccess" => "False2"]);
             } else return response()->json(["isSuccess" => "False", "reason" => "file is unvalid"]);
@@ -80,10 +80,10 @@ class DevelopController extends Controller
                 $img1_extension === 'jpg' || $img1_extension === 'gif'
             ) {
                 $img1_name = time() . rand(100000, 999999) . '.' . $img1_extension;
-                $img1path = Storage::putFileAs('screen', $img1, $img1_name);
+                $img1path = Storage::putFileAs('public/screen', $img1, $img1_name);
                 AppImgs::insert(
                     [
-                        'appId' => $app->id, 'screenShot' =>  $img1path,
+                        'appId' => $app->id, 'screenShot' =>   Storage::url($img1path),
                     ]
                 );
             } else return response()->json(["isSuccess" => "False", "reason" => "img1 extension error"]);
@@ -94,10 +94,10 @@ class DevelopController extends Controller
                 $img2_extension === 'jpg' || $img2_extension === 'gif'
             ) {
                 $img2_name = time() . rand(100000, 999999) . '.' . $img2_extension;
-                $img2path = Storage::putFileAs('screen', $img2, $img2_name);
+                $img2path = Storage::putFileAs('public/screen', $img2, $img2_name);
                 AppImgs::insert(
                     [
-                        'appId' => $app->id, 'screenShot' =>  $img2path,
+                        'appId' => $app->id, 'screenShot' =>   Storage::url($img2path),
                     ]
                 );
             } else return response()->json(["isSuccess" => "False", "reason" => "img2 extension error"]);

@@ -128,11 +128,10 @@ class AdminController extends Controller
             $extension === 'jpg' || $extension === 'gif'
         ) {
             $file_name =  time() . rand(100000, 999999) . '.' . $extension;
-            // $file_name = time(). '.' . $extension;
-            $path = Storage::putFileAs('Member_icon', $icon, $file_name);
+            $path = Storage::putFileAs('public/Member_icon', $icon, $file_name);
             if ($icon->isValid()) {
                 MemberImgs::insert(
-                    ['img' => $path,]
+                    ['img' => Storage::url($path),]
                 );
             }
             return response()->json(["isSuccess" => "True"]);
