@@ -73,11 +73,10 @@ class AdminController extends Controller
      */
 
     //修改密碼(待討論是否可以修改Name)
-    public function pwdChange(Members $member, Request $request, $id)
+    public function pwdChange(Request $request, $id)
     {
 
         $this->validate($request, [
-            'name' => 'required|string',
             'oldPwd' => ['required', 'regex:/[0-9A-Za-z]/', 'min:8', 'max:12'],
             'newPwd' => ['required', 'regex:/[0-9A-Za-z]/', 'min:8', 'max:12'],
             'pwdCheck' => ['required', 'same:newPwd'],
@@ -102,40 +101,6 @@ class AdminController extends Controller
     public function destroy($id)
     {
         //
-    }
-
-    //新增分類
-    public function addCategory(Request $request)
-    {
-        $this->validate($request, [
-            'category' => 'required|string|unique:categories',
-        ]);
-        if (isset($request->category)) {
-            $category = $request->category;
-            Categories::insert(['category' => $category]);
-            return response()->json(["isSuccess" => "True"]);
-        } else return response()->json(["isSuccess" => "False"]);
-    }
-
-
-    //管理員新增會員頭像
-    public function newIcon(Request $request)
-    {
-        $icon = $request->file('imgs');
-        $extension = strtolower($icon->getClientOriginalExtension()); //副檔名轉小寫
-        if (
-            $extension === 'png' || $extension === 'jpeg' ||
-            $extension === 'jpg' || $extension === 'gif'
-        ) {
-            $file_name =  time() . rand(100000, 999999) . '.' . $extension;
-            $path = Storage::putFileAs('public/Member_icon', $icon, $file_name);
-            if ($icon->isValid()) {
-                MemberImgs::insert(
-                    ['img' => Storage::url($path),]
-                );
-            }
-            return response()->json(["isSuccess" => "True"]);
-        } else return response()->json(["isSuccess" => "False", "reason" => "file extension error"]);
     }
 
     //列出全部未審核的app
@@ -279,7 +244,7 @@ class AdminController extends Controller
         $count = Apps::where([['id', '=', $id], ['stopRight', '=', 1]])->count();
         if ($count === 1) {
             Apps::where('id', '=', $id)->update(['stopRight' => 0]);
-            return Apps::select('id', 'appName', 'summary', 'device')->get();
+            return Apps::select('id', 'appName', 'summary', 'device', 'stopRight')->get();
         } else return response()->json(["isSuccess" => "False", "reason" => "App not found"]);
     }
 
@@ -289,7 +254,7 @@ class AdminController extends Controller
         $count = Apps::where([['id', '=', $id], ['stopRight', '=', 0]])->count();
         if ($count === 1) {
             Apps::where('id', '=', $id)->update(['stopRight' => 1]);
-            return Apps::select('id', 'appName', 'summary', 'device')->get();
+            return Apps::select('id', 'appName', 'summary', 'device', 'stopRight')->get();
         } else return response()->json(["isSuccess" => "False", "reason" => "App not found"]);
     }
 
@@ -314,5 +279,49 @@ class AdminController extends Controller
         ]);
 
         return response()->json(["isSuccess" => "True"]);
+    }
+
+
+    //新增分類
+    public function addCategory(Request $request)
+    {
+        $this->validate($request, [
+            'category' => 'required|string|unique:categories',
+        ]);
+        if (isset($request->category)) {
+            $category = $request->category;
+            Categories::insert(['category' => $category]);
+            return response()->json(["isSuccess" => "True"]);
+        } else return response()->json(["isSuccess" => "False"]);
+    }
+
+    //類別名稱及該類別APP數量
+    public function countCategory()
+    {
+        $total = Categories::count();
+        $allCate = Categories::select('id', 'category')->get();
+        for ($i = 0; $i < $total; $i++) {
+            $count[$i] = apps::where('categoryId', '=', $i + 1)->count();
+        }
+        return response()->json(["total" => $total, "all" => $allCate, "each" => $count]);
+    }
+    //管理員新增會員頭像
+    public function newIcon(Request $request)
+    {
+        $icon = $request->file('imgs');
+        $extension = strtolower($icon->getClientOriginalExtension()); //副檔名轉小寫
+        if (
+            $extension === 'png' || $extension === 'jpeg' ||
+            $extension === 'jpg' || $extension === 'gif'
+        ) {
+            $file_name =  time() . rand(100000, 999999) . '.' . $extension;
+            $path = Storage::putFileAs('public/Member_icon', $icon, $file_name);
+            if ($icon->isValid()) {
+                MemberImgs::insert(
+                    ['img' => Storage::url($path),]
+                );
+            }
+            return response()->json(["isSuccess" => "True"]);
+        } else return response()->json(["isSuccess" => "False", "reason" => "file extension error"]);
     }
 }

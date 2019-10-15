@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Apps;
 use App\AppImgs;
 use App\Categories;
+use App\MemberImgs;
 use App\Members;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Http\Request;
@@ -16,6 +17,15 @@ class DevelopController extends Controller
     //上傳App
     public function appUp(Request $request)
     {
+        // $data = $request->all();
+        // $imgs = $data['imgs'];
+        // var_dump($imgs);
+        // foreach ($imgs as $key => $value) {
+        //     dd($value);
+        // }
+        // dd();
+        // $imgs2 = Storage::putFile('public/screen', $imgs);
+        // return $imgs;
         if ($request->hasFile('file') && $request->hasFile('icon') && $request->hasFile('img1') && $request->hasFile('img2')) {
             $icon = $request->file('icon');   //icon
             $icon_extension = strtolower($icon->getClientOriginalExtension());

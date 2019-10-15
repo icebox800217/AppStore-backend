@@ -74,6 +74,8 @@ Route::PUT('/Admin/restoreApp/{id}', 'AdminController@restoreApp');
 
 //新增開發者
 Route::POST('/Admin/newDeveloper', 'AdminController@newDeveloper');
+//類別名稱及該類別APP數量
+Route::GET('/Admin/countCategory', 'AdminController@countCategory');
 
 route::POST('/Admin/newIcon', 'AdminController@newIcon');
 //管理員新增會員頭像
