@@ -30,7 +30,7 @@ class DevelopController extends Controller
      */
     
     
-   //上傳App
+   //開發者上傳App
    public function appUp(Request $request)
    {
 
@@ -124,6 +124,33 @@ class DevelopController extends Controller
        } else return response()->json(["isSuccess" => "False", "reason" => "one of the upload is empty"]);
    }
 
+    //開發者的App下載次數
+    public function appRank($id)
+    {
+        // $contents = Storage::get('file.jpg');
+        $count = Apps::where('memberId', '=', $id)->count();
+        $List = Apps::where('memberId', '=', $id)->orderBy('downloadTimes', 'desc')
+            ->select('id', 'appName', 'summary', 'downloadTimes', 'appIcon')->get();
+        for ($i = 0; $i < $count; $i++) {
+        $List[$i]->appIcon = asset($List[$i]->appIcon);
+        }
+        return $List;
+    }
+    //開發者的所有App列表(含審核狀態)
+    public function appList($id)
+    {
+        $count = Apps::where('memberId', '=', $id)->count();
+        $appList = Apps::where('memberId', '=', $id)->select('id', 'appName', 'summary', 'created_at', 'verify')->get();
+        for ($i = 0; $i < $count; $i++) {
+            if ($appList[$i]->verify === 3)
+                $appList[$i]->verify = '待審核';
+            else if ($appList[$i]->verify === 2)
+                $appList[$i]->verify = '退回';
+            else if ($appList[$i]->verify === 1)
+                $appList[$i]->verify = '審核通過';
+        }
+        return $appList;
+    }
 
     public function store(Request $request)
     {
