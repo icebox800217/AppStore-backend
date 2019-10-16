@@ -29,13 +29,16 @@ Route::POST('/logout', 'MembersController@logout');
 
 //////////////////////////////////////////////////////////////////
 //砲台哥的開發者畫面
-//上傳App
-Route::POST('/develop/upload', 'DevelopController@appUp');
+//上傳App(Android)
+Route::POST('/develop/Android', 'DevelopController@ApkUp');
+//上傳App(Ios)
+Route::POST('/develop/Ios', 'DevelopController@IpaUp');
 //列出該開發者自己的App download Rank
 Route::GET('/develop/appRank/{id}', 'DevelopController@appRank');
 //自己開發的所有App列表(含審核狀態)
 Route::GET('/develop/appList/{id}', 'DevelopController@appList');
-
+//上傳檔案畫面 - 分類列表
+Route::GET('/develop/categories', 'DevelopController@categoryList');
 //////////////////////////////////////////////////////////////////
 //林林的管理者畫面
 //計算未審app數、未審開發人員數 及 列出下載量前五名的app
