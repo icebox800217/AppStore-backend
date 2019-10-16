@@ -66,13 +66,13 @@ class DevelopController extends Controller
                        'memberId' => $request->memberId,
                        'summary' => $request->summary,
                        'introduction' => $request->introduction,
-                       'appIcon' => $icon_path,
+                       'appIcon' => Storage::url($icon_path),
                        'categoryId' => $request->categoryId,
                        'tags' => $request->tags,
                        'device' => 'android',
                        'version' => $request->version,
                        'changelog' => $request->changelog,
-                       'fileURL' => $filepath,
+                       'fileURL' => Storage::url($filepath),
                    ]);
                } else if ($file_extension === 'ipa') {
                    $filepath = Storage::putFileAs('file/ios', $file, $file_name);
@@ -81,17 +81,17 @@ class DevelopController extends Controller
                        'memberId' => $request->memberId,
                        'summary' => $request->summary,
                        'introduction' => $request->introduction,
-                       'appIcon' => $icon_path,
+                       'appIcon' => Storage::url($icon_path),
                        'categoryId' => $request->categoryId,
                        'tags' => $request->tags,
                        'device' => 'ios',
                        'version' => $request->version,
                        'changelog' => $request->changelog,
-                       'fileURL' => $filepath,
+                       'fileURL' =>Storage::url($filepath),
                    ]);
                } else return response()->json(["isSuccess" => "False2"]);
            } else return response()->json(["isSuccess" => "False", "reason" => "file is unvalid"]);
-           $app = Apps::where('fileURL', $filepath)->firstOrFail();
+           $app = Apps::where('fileURL', Storage::url($filepath))->firstOrFail();
            $img1 = $request->file('img1'); //截圖1
            $img1_extension = strtolower($img1->getClientOriginalExtension());
            if (
@@ -102,7 +102,7 @@ class DevelopController extends Controller
                $img1path = Storage::putFileAs('screen', $img1, $img1_name);
                AppImgs::insert(
                    [
-                       'appId' => $app->id, 'screenShot' =>  $img1path,
+                       'appId' => $app->id, 'screenShot' =>  Storage::url($img1path),
                    ]
                );
            } else return response()->json(["isSuccess" => "False", "reason" => "img1 extension error"]);
@@ -116,7 +116,7 @@ class DevelopController extends Controller
                $img2path = Storage::putFileAs('screen', $img2, $img2_name);
                AppImgs::insert(
                    [
-                       'appId' => $app->id, 'screenShot' =>  $img2path,
+                       'appId' => $app->id, 'screenShot' =>  Storage::url($img2path),
                    ]
                );
            } else return response()->json(["isSuccess" => "False", "reason" => "img2 extension error"]);
