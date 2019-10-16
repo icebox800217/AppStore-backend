@@ -88,9 +88,9 @@ class MembersController extends Controller
                     ['email', '=', $email], ['password', '=', $password]
                 ])->join('member_imgs', 'members.imgId', '=', 'member_imgs.id');
 
-                $right = $data->firstOrFail()->right; //確認是否被停權
+                $permission = $data->firstOrFail()->permission; //確認是否被停權
 
-                if ($right === 1) {
+                if ($permission === 1) {
                     $memberinfo = $data->select('members.id','name', 'level', 'img')->firstOrFail();
                     session::put('id', $memberinfo->id);
                     session::put('name', $memberinfo->name);
