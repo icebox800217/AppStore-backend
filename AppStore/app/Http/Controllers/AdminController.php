@@ -291,7 +291,12 @@ class AdminController extends Controller
         if (isset($request->category)) {
             $category = $request->category;
             Categories::insert(['category' => $category]);
-            return response()->json(["isSuccess" => "True"]);
+            $total = Categories::count();
+            $allCate = Categories::select('id', 'category')->get();
+            for ($i = 0; $i < $total; $i++) {
+                $count[$i] = apps::where('categoryId', '=', $i + 1)->count();
+            }
+            return response()->json(["all" => $allCate, "each" => $count]);
         } else return response()->json(["isSuccess" => "False"]);
     }
 
@@ -303,7 +308,7 @@ class AdminController extends Controller
         for ($i = 0; $i < $total; $i++) {
             $count[$i] = apps::where('categoryId', '=', $i + 1)->count();
         }
-        return response()->json(["total" => $total, "all" => $allCate, "each" => $count]);
+        return response()->json(["all" => $allCate, "each" => $count]);
     }
     //管理員新增會員頭像
     public function newIcon(Request $request)
