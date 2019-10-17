@@ -244,7 +244,7 @@ class AdminController extends Controller
         $count = Apps::where([['id', '=', $id], ['stopRight', '=', 1]])->count();
         if ($count === 1) {
             Apps::where('id', '=', $id)->update(['stopRight' => 0]);
-            return Apps::select('id', 'appName', 'summary', 'device', 'stopRight')->get();
+            return Apps::where('verify', '=', 1)->select('id', 'appName', 'summary', 'device', 'stopRight')->get();
         } else return response()->json(["isSuccess" => "False", "reason" => "App not found"]);
     }
 
@@ -254,7 +254,7 @@ class AdminController extends Controller
         $count = Apps::where([['id', '=', $id], ['stopRight', '=', 0]])->count();
         if ($count === 1) {
             Apps::where('id', '=', $id)->update(['stopRight' => 1]);
-            return Apps::select('id', 'appName', 'summary', 'device', 'stopRight')->get();
+            return Apps::where('verify', '=', 1)->select('id', 'appName', 'summary', 'device', 'stopRight')->get();
         } else return response()->json(["isSuccess" => "False", "reason" => "App not found"]);
     }
 
