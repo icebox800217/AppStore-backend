@@ -10,6 +10,8 @@ use App\Members;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use App\Http\Resources\MembersResource;
+use App\Http\Resources\MembersResourceCollection;
 
 
 class DevelopController extends Controller
@@ -17,99 +19,9 @@ class DevelopController extends Controller
     //上傳App(apk)
     public function ApkUp(Request $request)
     {
-        // $data = $request->all();
-        // $imgs = $data['imgs'];
-        // var_dump($imgs);
-        // foreach ($imgs as $key => $value) {
-        //     dd($value);
-        // }
-        // dd();
-        // $imgs2 = Storage::putFile('public/screen', $imgs);
-        // return $imgs;
-        // if ($request->hasFile('file') && $request->hasFile('icon') && $request->hasFile('img1') && $request->hasFile('img2')) {
-        //     //處理icon
-        //     $icon = $request->file('icon');
-        //     $icon_extension = strtolower($icon->getClientOriginalExtension());
-        //     if (
-        //         $icon_extension === 'png' || $icon_extension === 'jpeg' ||
-        //         $icon_extension === 'jpg' || $icon_extension === 'gif'
-        //     ) {
-        //         $icon_name = time() . rand(100000, 999999) . '.' . $icon_extension;
-        //         $icon_path = Storage::url(Storage::putFileAs('public/icon', $icon, $icon_name));
-        //     } else return response()->json(["isSuccess" => "False", "reason" => "icon extension error"]);
-        //     //處理apk檔
-        //     $file = $request->file('file');
-        //     $file_extension = $file->getClientOriginalExtension();
-        //     $version = str_replace('.', '_', $request->version); //將版本的點換成底線
-        //     $file_name = time() . rand(100000, 999999) . $version . '.' . $file_extension;
-        //     //處理tags
+        if ($request->hasFile('file') && $request->hasFile('icon') && $request->hasFile('img1') && $request->hasFile('img2')) {
+            $tags = array_filter($request->tags); //清除空值
 
-        //     if ($file->isValid()) {
-        //         $this->validate($request, [
-        //             'appName' => 'required|string|max:50',
-        //             'summary' => 'required|string|max:50',  //簡短介紹
-        //             'introduction' => 'required|string',   //說明
-        //             'tags' => 'required|string|min:2|max:20',
-        //             'version' => ['required', 'string', 'max:20', 'regex:/^[0-1]\.[0-9]*\.[0-9]$/'],
-        //         ]);
-        //         if ($file_extension === 'apk') {
-        //             $filepath = Storage::url(Storage::putFileAs('public/file/android', $file, $file_name));
-        //             apps::insert([
-        //                 'appName' => $request->appName,
-        //                 'memberId' => $request->memberId,
-        //                 'summary' => $request->summary,
-        //                 'introduction' => $request->introduction,
-        //                 'appIcon' => $icon_path,
-        //                 'categoryId' => $request->categoryId,
-        //                 'tags' => $request->tags,
-        //                 'device' => 'android',
-        //                 'version' => $request->version,
-        //                 'changelog' => $request->changelog,
-        //                 'fileURL' => $filepath,
-        //             ]);
-        //         } else return response()->json(["isSuccess" => "False", "reason" => "file is not for android"]);
-        //     } else return response()->json(["isSuccess" => "False", "reason" => "file is unvalid"]);
-        //     //新增進資料庫後以路徑找到該檔案的Id
-        //     $app = Apps::where('fileURL', $filepath)->firstOrFail();
-        //     //處理截圖1
-        //     $img1 = $request->file('img1');
-        //     $img1_extension = strtolower($img1->getClientOriginalExtension());
-        //     if (
-        //         $img1_extension === 'png' || $img1_extension === 'jpeg' ||
-        //         $img1_extension === 'jpg' || $img1_extension === 'gif'
-        //     ) {
-        //         $img1_name = time() . rand(100000, 999999) . '.' . $img1_extension;
-        //         $img1path = Storage::url(Storage::putFileAs('public/screen', $img1, $img1_name));
-        //         AppImgs::insert(
-        //             [
-        //                 'appId' => $app->id, 'screenShot' =>  $img1path,
-        //             ]
-        //         );
-        //     } else return response()->json(["isSuccess" => "False", "reason" => "img1 extension error"]);
-        //     //處理截圖2
-        //     $img2 = $request->file('img2');
-        //     $img2_extension = strtolower($img2->getClientOriginalExtension());
-        //     if (
-        //         $img2_extension === 'png' || $img2_extension === 'jpeg' ||
-        //         $img2_extension === 'jpg' || $img2_extension === 'gif'
-        //     ) {
-        //         $img2_name = time() . rand(100000, 999999) . '.' . $img2_extension;
-        //         $img2path =  Storage::url(Storage::putFileAs('public/screen', $img2, $img2_name));
-        //         AppImgs::insert(
-        //             [
-        //                 'appId' => $app->id, 'screenShot' =>  $img2path,
-        //             ]
-        //         );
-        //     } else return response()->json(["isSuccess" => "False", "reason" => "img2 extension error"]);
-        //     return response()->json(["isSuccess" => "True"]);
-        // } else return response()->json(["isSuccess" => "False", "reason" => "one of the upload is empty"]);
-    }
-
-
-    //上傳App(ios)
-    public function IosUp(Request $request)
-    {
-        if ($request->hasFile('file') && $request->hasFile('icon') && $request->hasFile('img1') && $request->hasFile('img2') && $request->hasFile('plist')) {
             //處理icon
             $icon = $request->file('icon');
             $icon_extension = strtolower($icon->getClientOriginalExtension());
@@ -120,38 +32,39 @@ class DevelopController extends Controller
                 $icon_name = time() . rand(100000, 999999) . '.' . $icon_extension;
                 $icon_path = Storage::url(Storage::putFileAs('public/icon', $icon, $icon_name));
             } else return response()->json(["isSuccess" => "False", "reason" => "icon extension error"]);
-            //處理ios檔
+            //處理apk檔
             $file = $request->file('file');
             $file_extension = $file->getClientOriginalExtension();
             $version = str_replace('.', '_', $request->version); //將版本的點換成底線
             $file_name = time() . rand(100000, 999999) . $version . '.' . $file_extension;
+            //處理tags
+
             if ($file->isValid()) {
                 $this->validate($request, [
                     'appName' => 'required|string|max:50',
                     'summary' => 'required|string|max:50',  //簡短介紹
                     'introduction' => 'required|string',   //說明
-                    'tags' => 'required|string|max:20',
+                    'tags' => 'required|string|min:2|max:20',
                     'version' => ['required', 'string', 'max:20', 'regex:/^[0-1]\.[0-9]*\.[0-9]$/'],
-                    'changelog' => 'required|string',  //更新異動
                 ]);
-                if ($file_extension === 'ipa') {
-                    $filepath = Storage::putFileAs('public/file/ios', $file, $file_name);
+                if ($file_extension === 'apk') {
+                    $filepath = Storage::url(Storage::putFileAs('public/file/android', $file, $file_name));
                     apps::insert([
                         'appName' => $request->appName,
                         'memberId' => $request->memberId,
                         'summary' => $request->summary,
                         'introduction' => $request->introduction,
-                        'appIcon' =>  $icon_path,
-                        'categoryId' => $request->categoryId,
-                        'tags' => $request->tags,
-                        'device' => 'ios',
+                        'appIcon' => $icon_path,
+                        'categoryId' => $request->value,
+                        'tags' => $tags,
+                        'device' => 'android',
                         'version' => $request->version,
                         'changelog' => $request->changelog,
-                        'fileURL' =>  $filepath,
+                        'fileURL' => $filepath,
                     ]);
-                } else return response()->json(["isSuccess" => "False2"]);
+                } else return response()->json(["isSuccess" => "False", "reason" => "file is not for android"]);
             } else return response()->json(["isSuccess" => "False", "reason" => "file is unvalid"]);
-
+            //新增進資料庫後以路徑找到該檔案的Id
             $app = Apps::where('fileURL', $filepath)->firstOrFail();
             //處理截圖1
             $img1 = $request->file('img1');
@@ -185,6 +98,88 @@ class DevelopController extends Controller
             } else return response()->json(["isSuccess" => "False", "reason" => "img2 extension error"]);
             return response()->json(["isSuccess" => "True"]);
         } else return response()->json(["isSuccess" => "False", "reason" => "one of the upload is empty"]);
+    }
+
+
+    //上傳App(ios)
+    public function IosUp(Request $request)
+    {
+        // if ($request->hasFile('file') && $request->hasFile('icon') && $request->hasFile('img1') && $request->hasFile('img2') && $request->hasFile('plist')) {
+        //     //處理icon
+        //     $icon = $request->file('icon');
+        //     $icon_extension = strtolower($icon->getClientOriginalExtension());
+        //     if (
+        //         $icon_extension === 'png' || $icon_extension === 'jpeg' ||
+        //         $icon_extension === 'jpg' || $icon_extension === 'gif'
+        //     ) {
+        //         $icon_name = time() . rand(100000, 999999) . '.' . $icon_extension;
+        //         $icon_path = Storage::url(Storage::putFileAs('public/icon', $icon, $icon_name));
+        //     } else return response()->json(["isSuccess" => "False", "reason" => "icon extension error"]);
+        //     //處理ios檔
+        //     $file = $request->file('file');
+        //     $file_extension = $file->getClientOriginalExtension();
+        //     $version = str_replace('.', '_', $request->version); //將版本的點換成底線
+        //     $file_name = time() . rand(100000, 999999) . $version . '.' . $file_extension;
+        //     if ($file->isValid()) {
+        //         $this->validate($request, [
+        //             'appName' => 'required|string|max:50',
+        //             'summary' => 'required|string|max:50',  //簡短介紹
+        //             'introduction' => 'required|string',   //說明
+        //             'tags' => 'required|string|max:20',
+        //             'version' => ['required', 'string', 'max:20', 'regex:/^[0-1]\.[0-9]*\.[0-9]$/'],
+        //             'changelog' => 'required|string',  //更新異動
+        //         ]);
+        //         if ($file_extension === 'ipa') {
+        //             $filepath = Storage::putFileAs('public/file/ios', $file, $file_name);
+        //             apps::insert([
+        //                 'appName' => $request->appName,
+        //                 'memberId' => $request->memberId,
+        //                 'summary' => $request->summary,
+        //                 'introduction' => $request->introduction,
+        //                 'appIcon' =>  $icon_path,
+        //                 'categoryId' => $request->categoryId,
+        //                 'tags' => $request->tags,
+        //                 'device' => 'ios',
+        //                 'version' => $request->version,
+        //                 'changelog' => $request->changelog,
+        //                 'fileURL' =>  $filepath,
+        //             ]);
+        //         } else return response()->json(["isSuccess" => "False2"]);
+        //     } else return response()->json(["isSuccess" => "False", "reason" => "file is unvalid"]);
+
+        //     $app = Apps::where('fileURL', $filepath)->firstOrFail();
+        //     //處理截圖1
+        //     $img1 = $request->file('img1');
+        //     $img1_extension = strtolower($img1->getClientOriginalExtension());
+        //     if (
+        //         $img1_extension === 'png' || $img1_extension === 'jpeg' ||
+        //         $img1_extension === 'jpg' || $img1_extension === 'gif'
+        //     ) {
+        //         $img1_name = time() . rand(100000, 999999) . '.' . $img1_extension;
+        //         $img1path = Storage::url(Storage::putFileAs('public/screen', $img1, $img1_name));
+        //         AppImgs::insert(
+        //             [
+        //                 'appId' => $app->id, 'screenShot' =>  $img1path,
+        //             ]
+        //         );
+        //     } else return response()->json(["isSuccess" => "False", "reason" => "img1 extension error"]);
+        //     //處理截圖2
+        //     $img2 = $request->file('img2');
+        //     $img2_extension = strtolower($img2->getClientOriginalExtension());
+        //     if (
+        //         $img2_extension === 'png' || $img2_extension === 'jpeg' ||
+        //         $img2_extension === 'jpg' || $img2_extension === 'gif'
+        //     ) {
+        //         $img2_name = time() . rand(100000, 999999) . '.' . $img2_extension;
+        //         $img2path =  Storage::url(Storage::putFileAs('public/screen', $img2, $img2_name));
+        //         AppImgs::insert(
+        //             [
+        //                 'appId' => $app->id, 'screenShot' =>  $img2path,
+        //             ]
+        //         );
+        //     } else return response()->json(["isSuccess" => "False", "reason" => "img2 extension error"]);
+        //     return response()->json(["isSuccess" => "True"]);
+        // } else return response()->json(["isSuccess" => "False", "reason" => "one of the upload is empty"]);
     }
 
 
