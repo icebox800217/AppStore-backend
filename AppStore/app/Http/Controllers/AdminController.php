@@ -185,7 +185,7 @@ class AdminController extends Controller
     public function memberManage()
     {
         $count = Members::count();
-        $List = Members::where('level', '<', 3)->select('id', 'name', 'phone', 'email', 'level', 'stopRight')->get();
+        $List = Members::where('level', '<', 3)->select('id', 'name', 'phone', 'email', 'level','permission')->get();
         for ($i = 0; $i < $count; $i++) {
             if ($List[$i]->level === 2) //開發者
                 $List[$i]->level = '是';
@@ -198,18 +198,18 @@ class AdminController extends Controller
     //App管理
     public function appManage()
     {
-        return Apps::where('verify', '=', 1)->select('id', 'appName', 'summary', 'device', 'stopRight')
+        return Apps::where('verify', '=', 1)->select('id', 'appName', 'summary', 'device','permission')
             ->get();
     }
 
     //會員停權
     public function stopMember($id)
     {
-        $count = Members::where([['id', '=', $id], ['stopRight', '=', 1]])->count();
+        $count = Members::where([['id', '=', $id], ['permission', '=', 1]])->count();
         if ($count === 1) {
-            Members::where('id', '=', $id)->update(['stopRight' => 0]);
+            Members::where('id', '=', $id)->update(['permission' => 0]);
             $count = Members::count();
-            $List = Members::where('level', '<', 3)->select('id', 'name', 'phone', 'email', 'level', 'stopRight')->get();
+            $List = Members::where('level', '<', 3)->select('id', 'name', 'phone', 'email', 'level', 'permission')->get();
             for ($i = 0; $i < $count; $i++) {
                 if ($List[$i]->level === 2) //開發者
                     $List[$i]->level = '是';
@@ -223,11 +223,11 @@ class AdminController extends Controller
     //會員停權恢復
     public function restoreMember($id)
     {
-        $count = Members::where([['id', '=', $id], ['stopRight', '=', 0]])->count();
+        $count = Members::where([['id', '=', $id], ['permission', '=', 0]])->count();
         if ($count === 1) {
-            Members::where('id', '=', $id)->update(['stopRight' => 1]);
+            Members::where('id', '=', $id)->update(['permission' => 1]);
             $count = Members::count();
-            $List = Members::where('level', '<', 3)->select('id', 'name', 'phone', 'email', 'level', 'stopRight')->get();
+            $List = Members::where('level', '<', 3)->select('id', 'name', 'phone', 'email', 'level', 'permission')->get();
             for ($i = 0; $i < $count; $i++) {
                 if ($List[$i]->level === 2) //開發者
                     $List[$i]->level = '是';
@@ -241,20 +241,20 @@ class AdminController extends Controller
     //App停權
     public function stopApp($id)
     {
-        $count = Apps::where([['id', '=', $id], ['stopRight', '=', 1]])->count();
+        $count = Apps::where([['id', '=', $id], ['permission', '=', 1]])->count();
         if ($count === 1) {
-            Apps::where('id', '=', $id)->update(['stopRight' => 0]);
-            return Apps::where('verify', '=', 1)->select('id', 'appName', 'summary', 'device', 'stopRight')->get();
+            Apps::where('id', '=', $id)->update(['permission' => 0]);
+            return Apps::where('verify', '=', 1)->select('id', 'appName', 'summary', 'device', 'permission')->get();
         } else return response()->json(["isSuccess" => "False", "reason" => "App not found"]);
     }
 
     //App停權恢復
     public function restoreApp($id)
     {
-        $count = Apps::where([['id', '=', $id], ['stopRight', '=', 0]])->count();
+        $count = Apps::where([['id', '=', $id], ['permission', '=', 0]])->count();
         if ($count === 1) {
-            Apps::where('id', '=', $id)->update(['stopRight' => 1]);
-            return Apps::where('verify', '=', 1)->select('id', 'appName', 'summary', 'device', 'stopRight')->get();
+            Apps::where('id', '=', $id)->update(['permission' => 1]);
+            return Apps::where('verify', '=', 1)->select('id', 'appName', 'summary', 'device', 'permission')->get();
         } else return response()->json(["isSuccess" => "False", "reason" => "App not found"]);
     }
 
