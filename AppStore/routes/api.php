@@ -33,6 +33,8 @@ Route::GET('/appLast','MembersController@appLast');
 //取得最新的app
 Route::GET('/appHot','MembersController@appHot');
 //取得最熱門的app
+Route::POST('/member/search','MembersController@search');
+//搜尋功能
 
 
 //開發者api

@@ -142,4 +142,19 @@ class MembersController extends Controller
         return $appHot;
         
      }
+    //搜尋功能
+    public function search(Request $request)
+    {   
+       $search = Apps::query()->join('members', 'members.id', '=', 'apps.memberId')
+        ->where('appName', 'LIKE', "%{$request->searchTerm}%") 
+        ->orWhere('tags', 'LIKE', "%{$request->searchTerm}%") 
+        ->orWhere('members.name', 'LIKE', "%{$request->searchTerm}%") 
+        ->orderby('appName')
+        ->orderby('tags')
+        ->orderby('members.name')
+        ->get();
+        return $search;
+    }
+
+
 }

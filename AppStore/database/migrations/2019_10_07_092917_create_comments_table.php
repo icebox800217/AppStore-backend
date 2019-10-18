@@ -20,7 +20,7 @@ class CreateCommentsTable extends Migration
             $table->integer('appId') ->unsigned();
             $table->foreign('appId')->references('id')->on('apps');
             $table->string('comment',255);
-            $table->tinyInteger('star')->default(0);
+            $table->tinyInteger('star')->nullable();
             $table->timestamp('created_at')->default(DB::raw('CURRENT_TIMESTAMP'));
             $table->timestamp('updated_at')->default(DB::raw('CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP'));
         });
