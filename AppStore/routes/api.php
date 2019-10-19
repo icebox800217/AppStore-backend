@@ -45,7 +45,8 @@ Route::GET('/develop/appRank/{id}', 'DevelopController@appRank');
 //開發者的App下載次數
 Route::GET('/develop/appList/{id}', 'DevelopController@appList');
 //開發者的所有App列表(含審核狀態)
-
+Route::GET('/develop/categories', 'DevelopController@categoryList');
+//上傳檔案畫面 - 分類列表
 
 //管理者api
 //////////////////////////////////////////////////////////////
@@ -87,6 +88,8 @@ Route::PUT('/Admin/restoreApp/{id}', 'AdminController@restoreApp');
 //App停權恢復
 Route::POST('/Admin/newDeveloper', 'AdminController@newDeveloper');
 //新增開發者
+Route::GET('/Admin/countCategory', 'AdminController@countCategory');
+//類別名稱及該類別APP數量
 
 
 
