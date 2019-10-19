@@ -42,6 +42,8 @@ class MembersController extends Controller
             'email' => 'required|email|unique:members',
             'idNumber' => ['required', 'regex:/^[A-Z][1,2]\d{8}$/', 'unique:members'],
             'password' => ['required', 'regex:/[0-9A-Za-z]/', 'min:8', 'max:12'],
+        ],['name.required'=>'請填寫姓名欄位'
+
         ]);
         Members::insert([
             'name' => $request->name,
@@ -50,6 +52,7 @@ class MembersController extends Controller
             'idNumber' => $request->idNumber,
             'password' => md5($request->password),
         ]);
+        return response()->json(["isSuccess" => "True"]);
     }
 
     /**
@@ -103,7 +106,8 @@ class MembersController extends Controller
             } else return  response()->json(["isSuccess" => "False"]);
         }
     }
-
+               
+                       
     //會員登出
     public function logout()
     {

@@ -10,25 +10,26 @@ use Illuminate\Http\Request;
 
 class AdminController extends Controller
 {
-     //修改密碼(待討論是否可以修改Name)
-    public function pwdChange(Members $member, Request $request, $id)
+    //修改密碼(待討論是否可以修改Name)
+    public function pwdChange(Request $request, $id)
     {
         $this->validate($request, [
-        'name' => 'required|string',
-        'oldPwd' => ['required', 'regex:/[0-9A-Za-z]/', 'min:8', 'max:12'],
-        'newPwd' => ['required', 'regex:/[0-9A-Za-z]/', 'min:8', 'max:12'],
-        'pwdCheck' => ['required', 'same:newPwd'],
-    ]);
-    // $id = session::get('member_id');
-    $oldPwd = md5($request->oldPwd);
-    $count = Members::where([
-        ['id', '=', $id], ['password', '=', $oldPwd]
-    ])->count();
-    if ($count === 1) {
-        Members::where('id', '=', $id)->update(['password' => md5($request->newPwd)]);
-        return response()->json(["isSuccess" => "True"]);
+            'oldPwd' => ['required', 'regex:/[0-9A-Za-z]/', 'min:8', 'max:12'],
+            'newPwd' => ['required', 'regex:/[0-9A-Za-z]/', 'min:8', 'max:12'],
+            'pwdCheck' => ['required', 'same:newPwd'],
+        ]);
+        // $id = session::get('member_id');
+        $oldPwd = md5($request->oldPwd);
+        $count = Members::where([
+            ['id', '=', $id], ['password', '=', $oldPwd]
+        ])->count();
+        if ($count === 1) {
+            Members::where('id', '=', $id)->update(['password' => md5($request->newPwd)]);
+            return response()->json(["isSuccess" => "True"]);
         } else return response()->json(["isSuccess" => "False"]);
     }
+
+
 
     //顯示所有分類
     public function getAllCategory(categories $categorie)
@@ -40,12 +41,19 @@ class AdminController extends Controller
     public function newCategory(Request $request)
     {
         $this->validate($request, [
-            'category' => 'required|string|max:4|unique:categories',
+            'category' => 'required|string|unique:categories',
         ]);
-        categories::insert(['category' => $request->category]);
-        return response()->json(["boolean" => "True"]);
+        if (isset($request->category)) {
+            $category = $request->category;
+            Categories::insert(['category' => $category]);
+            $total = Categories::count();
+            $allCate = Categories::select('id', 'category')->get();
+            for ($i = 0; $i < $total; $i++) {
+                $count[$i] = apps::where('categoryId', '=', $i + 1)->count();
+            }
+            return response()->json(["all" => $allCate, "each" => $count]);
+        } else return response()->json(["isSuccess" => "False"]);
     }
-    
 
     //管理員修改App分類
     public function updateCategory(categories $category, Request $request, $id)
@@ -66,16 +74,15 @@ class AdminController extends Controller
             $extension === 'png' || $extension === 'jpeg' ||
             $extension === 'jpg' || $extension === 'gif'
         ) {
-            $file_name = date('ymdHisu') . '.' . $extension;
-            // $file_name = time(). '.' . $extension;
-            $path = Storage::putFileAs('public/icon', $icon, $file_name);
+            $file_name =  time() . rand(100000, 999999) . '.' . $extension;
+            $path = Storage::url(Storage::putFileAs('public/Member_icon', $icon, $file_name));
             if ($icon->isValid()) {
                 MemberImgs::insert(
-                    ['img' => Storage::url($path)]
+                    ['img' => $path,]
                 );
             }
-            return response()->json(["boolean" => "True"]);
-        } else return response()->json(["boolean" => "False"]);
+            return response()->json(["isSuccess" => "True"]);
+        } else return response()->json(["isSuccess" => "False", "reason" => "file extension error"]);
     }
 
     //管理者首頁 - 計算未審app數、未審開發人員數 及 列出下載量前五名的app
@@ -87,7 +94,7 @@ class AdminController extends Controller
         $top5dowload = Apps::orderBy('downloadTimes', 'desc')->take(5)->pluck('appName');
         return response(['appCount' => $unCheck_app_count, 'devCount' => $unCheck_dev_Count, 'top5' => $top5dowload]);
     }
-
+ 
     //列出全部未審核的app
     public function appCheck()
     {
@@ -97,7 +104,6 @@ class AdminController extends Controller
             ->get();
     }
     
-   
     //App審核通過 (並return剩餘未審核) 
     //回傳欄位名有修改請告知前端
     public function appCheckOk($id)
@@ -109,20 +115,21 @@ class AdminController extends Controller
                 ->join('members', 'members.id', '=', 'apps.memberId')
                 ->select('apps.id', 'apps.appName', 'apps.summary', 'members.name', 'apps.created_at')
                 ->get();
-        } else return response()->json(["isSuccess" => "False"]);
+        } else return response()->json(["isSuccess" => "False", "reason" => "App not found"]);
     }
-    //App審核失敗-退回
-    public function appGoBack($id)
-    {
-        $count = Apps::where('id', '=', $id)->count();
-        if ($count === 1) {
-            Apps::where('id', '=', $id)->update(['verify' => 2]);
-            return Apps::where('apps.verify', '=', 3)
-                ->join('members', 'members.id', '=', 'apps.memberId')
-                ->select('apps.id', 'apps.appName', 'apps.summary', 'members.name', 'apps.created_at')
-                ->get();
-        } else return response()->json(["isSuccess" => "False"]);
-    }
+    
+   //App審核失敗-退回
+   public function appGoBack($id)
+   {
+       $count = Apps::where('id', '=', $id)->count();
+       if ($count === 1) {
+           Apps::where('id', '=', $id)->update(['verify' => 2]);
+           return Apps::where('apps.verify', '=', 3)
+               ->join('members', 'members.id', '=', 'apps.memberId')
+               ->select('apps.id', 'apps.appName', 'apps.summary', 'members.name', 'apps.created_at')
+               ->get();
+       } else return response()->json(["isSuccess" => "False", "reason" => "App not found"]);
+   }
 
     //列出未審核之開發者申請
     public function devCheck()
@@ -142,8 +149,9 @@ class AdminController extends Controller
             return Members::where('verify', '=', 0)
                 ->select('id', 'name', 'updated_at')
                 ->get();
-        } else return response()->json(["isSuccess" => "False"]);
+        } else return response()->json(["isSuccess" => "False", "reason" => "Member not found"]);
     }
+
     //開發者審核失敗-退回
     public function devGoBack($id)
     {
@@ -153,13 +161,14 @@ class AdminController extends Controller
             return Members::where('verify', '=', 0)
                 ->select('id', 'name', 'updated_at')
                 ->get();
-        } else return response()->json(["isSuccess" => "False"]);
+        } else return response()->json(["isSuccess" => "False", "reason" => "Member not found"]);
     }
+
     //會員管理
     public function memberManage()
     {
         $count = Members::count();
-        $List = Members::where('level', '<', 3)->select('id', 'name', 'phone', 'email', 'level')->get();
+        $List = Members::where('level', '<', 3)->select('id', 'name', 'phone', 'email', 'level','permission')->get();
         for ($i = 0; $i < $count; $i++) {
             if ($List[$i]->level === 2) //開發者
                 $List[$i]->level = '是';
@@ -168,7 +177,7 @@ class AdminController extends Controller
         }
         return $List;
     }
-
+    
      //會員停權
      public function stopMember($id)
      {
@@ -218,16 +227,17 @@ class AdminController extends Controller
         $count = Apps::where([['id', '=', $id], ['permission', '=', 1]])->count();
         if ($count === 1) {
             Apps::where('id', '=', $id)->update(['permission' => 0]);
-            return Apps::select('id', 'appName', 'summary', 'device', 'permission')->get();
+            return Apps::where('verify', '=', 1)->select('id', 'appName', 'summary', 'device', 'permission')->get();
         } else return response()->json(["isSuccess" => "False", "reason" => "App not found"]);
     }
+
     //App停權恢復
     public function restoreApp($id)
     {
         $count = Apps::where([['id', '=', $id], ['permission', '=', 0]])->count();
         if ($count === 1) {
             Apps::where('id', '=', $id)->update(['permission' => 1]);
-            return Apps::select('id', 'appName', 'summary', 'device', 'permission')->get();
+            return Apps::where('verify', '=', 1)->select('id', 'appName', 'summary', 'device', 'permission')->get();
         } else return response()->json(["isSuccess" => "False", "reason" => "App not found"]);
     }
 
@@ -250,5 +260,16 @@ class AdminController extends Controller
             'level' => 2
         ]);
         return response()->json(["isSuccess" => "True"]);
+    }
+    
+    //類別名稱及該類別APP數量
+    public function countCategory()
+    {
+        $total = Categories::count();
+        $allCate = Categories::select('id', 'category')->get();
+        for ($i = 0; $i < $total; $i++) {
+            $count[$i] = apps::where('categoryId', '=', $i + 1)->count();
+        }
+        return response()->json(["all" => $allCate, "each" => $count]);
     }
 }
