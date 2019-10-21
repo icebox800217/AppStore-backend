@@ -82,3 +82,5 @@ Route::GET('/Admin/countCategory', 'AdminController@countCategory');
 
 route::POST('/Admin/newIcon', 'AdminController@newIcon');
 //管理員新增會員頭像
+
+route::POST('/Admin/appCategory', 'AdminController@appCategory');

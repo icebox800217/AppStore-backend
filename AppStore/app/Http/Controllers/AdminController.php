@@ -8,6 +8,7 @@ use App\MemberImgs;
 use Illuminate\Http\Request;
 use App\Members;
 use App\Apps;
+use App\Comments;
 
 class AdminController extends Controller
 {
@@ -185,7 +186,7 @@ class AdminController extends Controller
     public function memberManage()
     {
         $count = Members::count();
-        $List = Members::where('level', '<', 3)->select('id', 'name', 'phone', 'email', 'level','permission')->get();
+        $List = Members::where('level', '<', 3)->select('id', 'name', 'phone', 'email', 'level', 'permission')->get();
         for ($i = 0; $i < $count; $i++) {
             if ($List[$i]->level === 2) //開發者
                 $List[$i]->level = '是';
@@ -198,7 +199,7 @@ class AdminController extends Controller
     //App管理
     public function appManage()
     {
-        return Apps::where('verify', '=', 1)->select('id', 'appName', 'summary', 'device','permission')
+        return Apps::where('verify', '=', 1)->select('id', 'appName', 'summary', 'device', 'permission')
             ->get();
     }
 
@@ -328,5 +329,25 @@ class AdminController extends Controller
             }
             return response()->json(["isSuccess" => "True"]);
         } else return response()->json(["isSuccess" => "False", "reason" => "file extension error"]);
+    }
+
+
+    public function appCategory(Request $request)
+    {
+        $categoryId = $request->categoryId;
+        $all = Apps::where('apps.categoryId', '=', $categoryId)
+            ->join('members', 'members.id', '=', 'apps.memberId')
+            ->select('apps.id', 'apps.appName', 'apps.summary', 'members.name', 'apps.created_at')
+            ->get();
+        $count = Apps::count();
+        for ($i = 0; $i < $count; $i++) {
+            $isnull = Comments::where('appId', '=', $i + 1)->count();
+            if ($isnull != 0) {
+                $test[$i] = Comments::where('appId', '=', $i + 1)->avg('star');
+            } else {
+                $test[$i] = '尚無評論'; 
+            }
+        }
+         return response()->json(["list" => $all, "star" => $test]);
     }
 }
