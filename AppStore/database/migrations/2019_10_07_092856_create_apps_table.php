@@ -26,7 +26,7 @@ class CreateAppsTable extends Migration
             $table->string('tags',20);
             $table->string('device',10);
             $table->string('version',20);
-            $table->string('changelog',600);
+            $table->string('changelog',600)->nullable();
             $table->string('fileURL')->unique();
             $table->integer('downloadTimes') ->unsigned()->default(0);
             $table->tinyInteger('verify')->default(3);

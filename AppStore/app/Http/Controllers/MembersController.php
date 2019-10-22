@@ -7,6 +7,7 @@ use App\Apps;
 use App\categories;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
+use App\Comments;
 
 
 class MembersController extends Controller
@@ -123,15 +124,24 @@ class MembersController extends Controller
     }
 
     //取得各分類app
-     public function appCategory(Apps $Apps, Request $request)
+    public function appCategory(Request $request)
      {
-        $categoryId = $request->categoryId;
-         return Apps::where('apps.categoryId', '=', $categoryId)
+         $categoryId = $request->categoryId;
+         $all = Apps::where('apps.categoryId', '=', $categoryId)
              ->join('members', 'members.id', '=', 'apps.memberId')
              ->select('apps.id', 'apps.appName', 'apps.summary', 'members.name', 'apps.created_at')
              ->get();
+         $count = Apps::count();
+         for ($i = 0; $i < $count; $i++) {
+             $isnull = Comments::where('appId', '=', $i + 1)->count();
+             if ($isnull != 0) {
+                 $test[$i] = Comments::where('appId', '=', $i + 1)->avg('star');
+             } else {
+                 $test[$i] = '尚無評論'; 
+             }
+         }
+          return response()->json(["list" => $all, "star" => $test]);
      }
-    
     //取得最新的app
      public function appLast()
      {
@@ -150,9 +160,9 @@ class MembersController extends Controller
     public function search(Request $request)
     {   
        $search = Apps::query()->join('members', 'members.id', '=', 'apps.memberId')
-        ->where('appName', 'LIKE', "%{$request->searchTerm}%") 
-        ->orWhere('tags', 'LIKE', "%{$request->searchTerm}%") 
-        ->orWhere('members.name', 'LIKE', "%{$request->searchTerm}%") 
+        ->where('appName', 'like', "%{$request->searchTerm}%") 
+        ->orWhere('tags', 'like', "%{$request->searchTerm}%") 
+        ->orWhere('members.name', 'like', "%{$request->searchTerm}%") 
         ->orderby('appName')
         ->orderby('tags')
         ->orderby('members.name')
@@ -160,5 +170,31 @@ class MembersController extends Controller
         return $search;
     }
 
+    //評論功能
+    public function comment(Request $request, $id)
+    {
+        $this->validate($request, [
+            'comment' => 'required|string|max:255',
+            'star' => 'required'
+        ]);
+
+        Comments::insert([
+            'memberId' => $id,
+            'appId' => $request->appId,
+            'comment' => $request->comment,
+            'star' => $request->star            
+        ]);
+        return response()->json(["isSuccess" => "True"]);
+    }
+
+    //修改評論
+    public function upcomment(Request $request, $id)
+    {
+        $this->validate($request, [
+            'comment' => 'string|max:255'
+        ]);
+        Comments::whereId($id)->update($request->all());
+        return response()->json(["isSuccess" => "True"]);
+    }
 
 }
