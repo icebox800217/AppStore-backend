@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Members;
 use App\Apps;
+use App\AppImgs;
 use App\categories;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
@@ -174,6 +175,13 @@ class MembersController extends Controller
     public function getApp(Apps $id)
     {
         return $id;
+    }
+
+    //顯示特定App截圖
+    public function getAppimg(Request $request)
+    {
+        return AppImgs::where('appId', '=', $request->id)
+        ->get();
     }
 
     //顯示評論
