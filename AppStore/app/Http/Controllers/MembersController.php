@@ -146,14 +146,14 @@ class MembersController extends Controller
     //取得最新的app
      public function appLast()
      {
-        $appLast = Apps::latest('created_at')->take(3)->get();
+        $appLast = Apps::latest('created_at')->take(20)->get();
         return $appLast;
      }
 
     //列出最熱門的app
      public function appHot()
      {   
-        $appHot= Apps::OrderBy('downloadTimes','desc')->take(3)->get();
+        $appHot= Apps::OrderBy('downloadTimes','desc')->take(20)->get();
         return $appHot;
         
      }
