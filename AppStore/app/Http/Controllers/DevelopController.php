@@ -124,16 +124,14 @@ class DevelopController extends Controller
             $name = time() . rand(100000, 999999) . $version;
             $file_name = $name . '.' . $file_extension;
             $plist_name = $name . '.' . $plist_extension;
-
             if ($file->isValid()) {
                 $this->validate($request, [
                     'appName' => 'required|string|max:50',
                     'summary' => 'required|string|max:50',  //簡短介紹
-                    'introduction' => 'required|string',   //說明
+                    'introduction' => 'required|string|max:1200',   //說明
                     'tags' => 'required|string|min:2|max:20',
                     'version' => ['required', 'string', 'max:20', 'regex:/^[0-1]\.[0-9]*\.[0-9]$/'],
                 ]);
-
                 if ($file_extension === 'ipa') {
                     $filepath = Storage::url(Storage::putFileAs('public/file/ios', $file, $file_name));
                     $plistpath = Storage::url(Storage::putFileAs('public/file/ios', $plist, $plist_name));
@@ -147,13 +145,13 @@ class DevelopController extends Controller
                         'tags' => $request->tags,
                         'device' => 'ios',
                         'version' => $request->version,
+                        'changelog'=> $request->changelog,
                         'fileURL' => $plistpath,
                     ]);
-                } else return response()->json(["isSuccess" => "False", "reason" => "file is not for android"]);
+                } else return response()->json(["isSuccess" => "False", "reason" => "file is not for ios"]);
             } else return response()->json(["isSuccess" => "False", "reason" => "file is unvalid"]);
             //新增進資料庫後以路徑找到該檔案的Id
             $app = Apps::where('fileURL', $plistpath)->firstOrFail();
-
             //處理截圖1
             $img1 = $request->file('img1');
             $img1_extension = strtolower($img1->getClientOriginalExtension());
