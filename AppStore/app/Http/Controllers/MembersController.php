@@ -170,6 +170,12 @@ class MembersController extends Controller
         return $search;
     }
     
+    //顯示特定App
+    public function getApp(Apps $id)
+    {
+        return $id;
+    }
+
     //顯示評論
     public function getcomment(Apps $id, Comments $comments)
     {
