@@ -189,7 +189,8 @@ class MembersController extends Controller
     {
         return Comments::where('appId', '=', $id->id)
         ->join('apps', 'apps.id', '=', 'Comments.appId')
-        ->select('comment', 'star')
+        ->join('members', 'members.id', '=', 'Comments.memberId')
+        ->select('comment', 'star', 'members.name', 'members.imgId')
         ->get();
     }
 
