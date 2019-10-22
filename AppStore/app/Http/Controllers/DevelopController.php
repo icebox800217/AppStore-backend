@@ -132,7 +132,7 @@ class DevelopController extends Controller
                     'tags' => 'required|string|min:2|max:20',
                     'version' => ['required', 'string', 'max:20', 'regex:/^[0-1]\.[0-9]*\.[0-9]$/'],
                 ]);
-                if ($file_extension === 'ipa') {
+                if ($file_extension === 'ipa' && $plist_extension === 'plist') {
                     $filepath = Storage::url(Storage::putFileAs('public/file/ios', $file, $file_name));
                     $plistpath = Storage::url(Storage::putFileAs('public/file/ios', $plist, $plist_name));
                     apps::insert([
@@ -145,7 +145,7 @@ class DevelopController extends Controller
                         'tags' => $request->tags,
                         'device' => 'ios',
                         'version' => $request->version,
-                        'changelog'=> $request->changelog,
+                        'changelog' => $request->changelog,
                         'fileURL' => $plistpath,
                     ]);
                 } else return response()->json(["isSuccess" => "False", "reason" => "file is not for ios"]);
