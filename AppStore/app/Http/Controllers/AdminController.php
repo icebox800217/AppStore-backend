@@ -267,6 +267,10 @@ class AdminController extends Controller
             'email' => 'required|email|unique:members',
             'idNumber' => ['required', 'regex:/^[A-Z][1,2]\d{8}$/', 'unique:members'],
             'password' => ['required', 'regex:/[0-9A-Za-z]/', 'min:8', 'max:12'],
+        ], [
+            'phone.unique' => 'phone_error1', 'phone.regex' => 'phone_error2',
+            'email.unique' => 'mail_error1', 'email.regex' => 'mail_error2',
+            'idNumber.unique' => 'id_error1', 'idNumber.regex' => 'id_error2',
         ]);
 
         Members::insert([
@@ -287,6 +291,8 @@ class AdminController extends Controller
     {
         $this->validate($request, [
             'category' => 'required|string|unique:categories',
+        ], [
+            'category.unique' => 'category_error',
         ]);
         if (isset($request->category)) {
             $category = $request->category;
@@ -310,6 +316,7 @@ class AdminController extends Controller
         }
         return response()->json(["all" => $allCate, "each" => $count]);
     }
+
     //管理員新增會員頭像
     public function newIcon(Request $request)
     {
