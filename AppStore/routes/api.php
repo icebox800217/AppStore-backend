@@ -35,12 +35,18 @@ Route::GET('/appHot','MembersController@appHot');
 //取得最熱門的app
 Route::POST('/member/search','MembersController@search');
 //搜尋功能
+Route::POST('/member/comment/{id}','MembersController@comment');
+//評論功能
+Route::PUT('/member/upcomment/{id}','MembersController@upcomment');
+//修改評論
 
 
 //開發者api
 //////////////////////////////////////////////////////////////
-Route::POST('/develop/upload', 'DevelopController@appUp');
-//開發者上傳App
+Route::POST('/develop/Android', 'DevelopController@ApkUp');
+//開發者上傳App(apk)
+Route::POST('/develop/Ios', 'DevelopController@IosUp');
+//開發者上傳App(ios)
 Route::GET('/develop/appRank/{id}', 'DevelopController@appRank');
 //開發者的App下載次數
 Route::GET('/develop/appList/{id}', 'DevelopController@appList');
