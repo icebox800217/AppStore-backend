@@ -35,6 +35,8 @@ Route::GET('/appHot','MembersController@appHot');
 //取得最熱門的app
 Route::POST('/member/search','MembersController@search');
 //搜尋功能
+Route::GET('/member/comment/{id}', 'MembersController@getcomment');
+//顯示評論
 Route::POST('/member/comment/{id}','MembersController@comment');
 //評論功能
 Route::PUT('/member/upcomment/{id}','MembersController@upcomment');
