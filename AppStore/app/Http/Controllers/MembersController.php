@@ -92,7 +92,7 @@ class MembersController extends Controller
                     ['email', '=', $email], ['password', '=', $password]
                 ])->join('member_imgs', 'members.imgId', '=', 'member_imgs.Id');
 
-                $right = $data->firstOrFail()->stopRight; //確認是否被停權
+                $right = $data->firstOrFail()->permission; //確認是否被停權
                 if ($right === 1) {
                     $memberinfo =  $data->select('members.id', 'name', 'level', 'img')->firstOrFail();
                     session::put('memberId', $memberinfo->id);
@@ -105,6 +105,7 @@ class MembersController extends Controller
                     return response()->json(["isSuccess" => "False"]);
                 }
             } else return  response()->json(["isSuccess" => "False"]);
+            // return  response()->json(["isSuccess" => "True"]);
         }
     }
 

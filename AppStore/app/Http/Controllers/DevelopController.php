@@ -134,7 +134,7 @@ class DevelopController extends Controller
                     'version' => ['required', 'string', 'max:20', 'regex:/^[0-1]\.[0-9]*\.[0-9]$/'],
                 ]);
 
-                if ($file_extension === 'apk') {
+                if ($file_extension === 'ipa') {
                     $filepath = Storage::url(Storage::putFileAs('public/file/ios', $file, $file_name));
                     $plistpath = Storage::url(Storage::putFileAs('public/file/ios', $plist, $plist_name));
                     apps::insert([
@@ -152,7 +152,7 @@ class DevelopController extends Controller
                 } else return response()->json(["isSuccess" => "False", "reason" => "file is not for android"]);
             } else return response()->json(["isSuccess" => "False", "reason" => "file is unvalid"]);
             //新增進資料庫後以路徑找到該檔案的Id
-            $app = Apps::where('fileURL', $filepath)->firstOrFail();
+            $app = Apps::where('fileURL', $plistpath)->firstOrFail();
 
             //處理截圖1
             $img1 = $request->file('img1');
@@ -187,8 +187,6 @@ class DevelopController extends Controller
             return response()->json(["isSuccess" => "True"]);
         } else return response()->json(["isSuccess" => "False", "reason" => "one of the upload is empty"]);
     }
-
-
 
     //自己的App排行
     public function appRank($id)

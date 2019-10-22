@@ -76,7 +76,6 @@ class AdminController extends Controller
     //修改密碼(待討論是否可以修改Name)
     public function pwdChange(Request $request, $id)
     {
-
         $this->validate($request, [
             'oldPwd' => ['required', 'regex:/[0-9A-Za-z]/', 'min:8', 'max:12'],
             'newPwd' => ['required', 'regex:/[0-9A-Za-z]/', 'min:8', 'max:12'],
@@ -259,7 +258,7 @@ class AdminController extends Controller
         } else return response()->json(["isSuccess" => "False", "reason" => "App not found"]);
     }
 
-    //新增開發者  >> 待測試 <<
+    //新增開發者 
     public function newDeveloper(Request $request)
     {
         $this->validate($request, [
