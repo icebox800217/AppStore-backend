@@ -37,6 +37,10 @@ Route::POST('/member/search','MembersController@search');
 //搜尋功能
 Route::GET('/member/App/{id}', 'MembersController@getApp');
 //顯示App
+Route::GET('/member/Appimg/{id}', 'MembersController@getAppimg');
+//顯示App截圖
+Route::GET('/member/App/{id}', 'MembersController@getApp');
+//顯示App
 Route::GET('/member/comment/{id}', 'MembersController@getcomment');
 //顯示評論
 Route::POST('/member/comment/{id}','MembersController@comment');
