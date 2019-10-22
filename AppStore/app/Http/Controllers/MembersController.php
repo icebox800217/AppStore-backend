@@ -169,6 +169,15 @@ class MembersController extends Controller
         ->get();
         return $search;
     }
+    
+    //顯示評論
+    public function getcomment(Apps $id, Comments $comments)
+    {
+        return Comments::where('appId', '=', $id->id)
+        ->join('apps', 'apps.id', '=', 'Comments.appId')
+        ->select('comment', 'star')
+        ->get();
+    }
 
     //評論功能
     public function comment(Request $request, $id)
