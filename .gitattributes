@@ -1,3 +1,11 @@
+<<<<<<< HEAD
 version https://git-lfs.github.com/spec/v1
 oid sha256:e5c9fc7b6f2f1dec769c1b575155aed5ffee482c8390075433c214112c0054bb
 size 200
+=======
+* text=auto
+*.css linguist-vendored
+*.scss linguist-vendored
+*.js linguist-vendored
+CHANGELOG.md export-ignore
+>>>>>>> c0be83618658ea99c9e9e51c66c8255ac69e8b42
