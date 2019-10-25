@@ -147,6 +147,7 @@ class MembersController extends Controller
         }
           return response()->json(["list" => $all, "star" => $star]);
      }
+
     //取得最新的app
      public function appLast()
      {
@@ -233,13 +234,12 @@ class MembersController extends Controller
         return response()->json(["isSuccess" => "True"]);
     }
 
-    //修改評論
-    public function click(Request $request, $id)
+    //下載次數增加
+    public function click( Request $request,Apps $id)
     {
-        $this->validate($request, [
-            'comment' => 'string|max:255'
-        ]);
-        Comments::whereId($id)->update($request->all());
+        // dd($id->downloadTimes);
+        $id->downloadTimes += 1;
+        $id->save();
         return response()->json(["isSuccess" => "True"]);
     }
 
