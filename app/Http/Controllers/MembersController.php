@@ -132,30 +132,42 @@ class MembersController extends Controller
              ->join('members', 'members.id', '=', 'apps.memberId')
              ->select('apps.id', 'apps.appName', 'apps.summary', 'members.name', 'apps.created_at')
              ->get();
-         $count = Apps::count();
-         for ($i = 0; $i < $count; $i++) {
-             $isnull = Comments::where('appId', '=', $i + 1)->count();
-             if ($isnull != 0) {
-                 $test[$i] = Comments::where('appId', '=', $i + 1)->avg('star');
-             } else {
-                 $test[$i] = '尚無評論'; 
-             }
-         }
-          return response()->json(["list" => $all, "star" => $test]);
+        //  $count = Apps::where('apps.categoryId', '=', $categoryId)->count();
+        //  for ($i = 0; $i < $count; $i++) {
+        //      $isnull = Comments::where('appId', '=', $i + 1)->count();
+        //      if ($isnull != 0) {
+        //          $star[$i] = Comments::where('appId', '=', $i + 1)->avg('star');
+        //      } else {
+        //          $star[$i] = '尚無評論'; 
+        //      }
+        //  }
+        foreach ($all as $key => $value) {
+            $appId = $value->id;
+            $star[] = Comments::where('appId', "=", $appId)->avg('star');
+        }
+          return response()->json(["list" => $all, "star" => $star]);
      }
     //取得最新的app
      public function appLast()
      {
         $appLast = Apps::latest('created_at')->take(20)->get();
-        return $appLast;
+        foreach ($appLast as $key => $value) {
+            $appId = $value->id;
+            $star[] = Comments::where('appId', "=", $appId)->avg('star');
+        }
+        return response()->json(["list" => $appLast, "star" => $star]);
      }
 
     //列出最熱門的app
      public function appHot()
      {   
         $appHot= Apps::OrderBy('downloadTimes','desc')->take(20)->get();
-        return $appHot;
-        
+        foreach ($appHot as $key => $value) {
+            $appId = $value->id;
+            $star[] = Comments::where('appId', "=", $appId)->avg('star');
+        }
+        return response()->json(["list" => $appHot, "star" => $star]);
+          
      }
     //搜尋功能
     public function search(Request $request)
@@ -213,6 +225,16 @@ class MembersController extends Controller
 
     //修改評論
     public function upcomment(Request $request, $id)
+    {
+        $this->validate($request, [
+            'comment' => 'string|max:255'
+        ]);
+        Comments::whereId($id)->update($request->all());
+        return response()->json(["isSuccess" => "True"]);
+    }
+
+    //修改評論
+    public function click(Request $request, $id)
     {
         $this->validate($request, [
             'comment' => 'string|max:255'

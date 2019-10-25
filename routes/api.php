@@ -47,6 +47,8 @@ Route::POST('/member/comment/{id}','MembersController@comment');
 //評論功能
 Route::PUT('/member/upcomment/{id}','MembersController@upcomment');
 //修改評論
+Route::PUT('/member/click/{id}','MembersController@click');
+//下載次數+1
 
 
 //開發者api
