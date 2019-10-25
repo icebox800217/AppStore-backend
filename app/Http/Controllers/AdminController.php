@@ -47,7 +47,7 @@ class AdminController extends Controller
             $category = $request->category;
             Categories::insert(['category' => $category]);
             $total = Categories::count();
-            $allCate = Categories::select('id', 'category')->get();
+            $allCate = Categories::select('id', 'category')->OrderBy('Categories.id')->get();
             for ($i = 0; $i < $total; $i++) {
                 $count[$i] = apps::where('categoryId', '=', $i + 1)->count();
             }
