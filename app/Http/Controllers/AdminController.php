@@ -10,7 +10,7 @@ use Illuminate\Http\Request;
 
 class AdminController extends Controller
 {
-    //修改密碼(待討論是否可以修改Name)
+    //修改密碼
     public function pwdChange(Request $request, $id)
     {
         $this->validate($request, [
@@ -47,7 +47,7 @@ class AdminController extends Controller
             $category = $request->category;
             Categories::insert(['category' => $category]);
             $total = Categories::count();
-            $allCate = Categories::select('id', 'category')->get();
+            $allCate = Categories::select('id', 'category')->orderBy('id')->get();
             for ($i = 0; $i < $total; $i++) {
                 $count[$i] = apps::where('categoryId', '=', $i + 1)->count();
             }
@@ -75,7 +75,7 @@ class AdminController extends Controller
             $extension === 'jpg' || $extension === 'gif'
         ) {
             $file_name =  time() . rand(100000, 999999) . '.' . $extension;
-            $path = Storage::url(Storage::putFileAs('public/Member_icon', $icon, $file_name));
+            $path = Storage::url(Storage::putFileAs('Member_icon', $icon, $file_name));
             if ($icon->isValid()) {
                 MemberImgs::insert(
                     ['img' => $path,]
@@ -180,12 +180,12 @@ class AdminController extends Controller
              Members::where('id', '=', $id)->update(['permission' => 0]);
              $count = Members::count();
              $List = Members::where('level', '<', 3)->select('id', 'name', 'phone', 'email', 'level', 'permission')->get();
-             for ($i = 0; $i < $count; $i++) {
-                 if ($List[$i]->level === 2) //開發者
-                     $List[$i]->level = '是';
-                 else if ($List[$i]->level === 1)
-                     $List[$i]->level = '否';
-             }
+            //  for ($i = 0; $i < $count; $i++) {
+            //      if ($List[$i]->level === 2) //開發者
+            //          $List[$i]->level = '是';
+            //      else if ($List[$i]->level === 1)
+            //          $List[$i]->level = '否';
+            //  }
              return $List;
          } else return response()->json(["isSuccess" => "False", "reason" => "Member not found"]);
      }
@@ -198,12 +198,12 @@ class AdminController extends Controller
              Members::where('id', '=', $id)->update(['permission' => 1]);
              $count = Members::count();
              $List = Members::where('level', '<', 3)->select('id', 'name', 'phone', 'email', 'level', 'permission')->get();
-             for ($i = 0; $i < $count; $i++) {
-                 if ($List[$i]->level === 2) //開發者
-                     $List[$i]->level = '是';
-                 else if ($List[$i]->level === 1)
-                     $List[$i]->level = '否';
-             }
+            //  for ($i = 0; $i < $count; $i++) {
+            //      if ($List[$i]->level === 2) //開發者
+            //          $List[$i]->level = '是';
+            //      else if ($List[$i]->level === 1)
+            //          $List[$i]->level = '否';
+            //  }
              return $List;
          } else return response()->json(["isSuccess" => "False", "reason" => "Member not found"]);
      }
@@ -260,7 +260,7 @@ class AdminController extends Controller
     public function countCategory()
     {
         $total = Categories::count();
-        $allCate = Categories::select('id', 'category')->get();
+        $allCate = Categories::select('id', 'category')->orderBy('id')->get();
         for ($i = 0; $i < $total; $i++) {
             $count[$i] = apps::where('categoryId', '=', $i + 1)->count();
         }
