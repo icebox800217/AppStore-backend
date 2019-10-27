@@ -206,7 +206,7 @@ class DevelopController extends Controller
         // $contents = Storage::get('file.jpg');
         $count = Apps::where('memberId', '=', $id)->count();
         $List = Apps::where('memberId', '=', $id)->orderBy('downloadTimes', 'desc')
-            ->select('id', 'appName', 'summary', 'downloadTimes', 'appIcon')->get();
+            ->select('id', 'appName', 'summary', 'downloadTimes', 'created_at', 'verify', 'appIcon')->get();
         for ($i = 0; $i < $count; $i++) {
         $List[$i]->appIcon = asset($List[$i]->appIcon);
         }

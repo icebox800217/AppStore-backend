@@ -97,6 +97,7 @@ class MembersController extends Controller
 
                 if ($permission === 1) {
                     $memberinfo = $data->select('members.id','name', 'level', 'img')->firstOrFail();
+                    $memberinfo->img = asset($memberinfo->img);
                     session::put('id', $memberinfo->id);
                     session::put('name', $memberinfo->name);
                     session::put('level', $memberinfo->level);
