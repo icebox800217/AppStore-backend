@@ -13,6 +13,9 @@ use App\Member;
 |
 */
 
+Route::group(['middleware' => ['members']], function () {
+    
+});
 //會員api
 //////////////////////////////////////////////////////////////
 Route::GET('/member', 'MembersController@getAllMember');
@@ -25,22 +28,26 @@ route::PUT('/member/{id}', 'MembersController@update');
 //修改會員資料
 Route::POST('/member/login','MembersController@login');
 //登入會員
-Route::POST('/member/logout','MembersController@logout');
+Route::GET('/member/logout','MembersController@logout');
 //登出會員
-Route::POST('/member/appCategory','MembersController@appCategory');
-//取得各分類app
-Route::GET('/appLast','MembersController@appLast');
-//取得最新的app
-Route::GET('/appHot','MembersController@appHot');
-//取得最熱門的app
+Route::POST('/member/appCategoryAnd','MembersController@appCategoryAnd');
+//取得各分類app(and)
+Route::POST('/member/appCategoryIos','MembersController@appCategoryIos');
+//取得各分類app(ios)
+Route::GET('/appLastAnd','MembersController@appLastAnd');
+//取得最新的app(and)
+Route::GET('/appLastIos','MembersController@appLastIos');
+//取得最新的app(ios)
+Route::GET('/appHotAnd','MembersController@appHotAnd');
+//取得最熱門的app(and)
+Route::GET('/appHotIos','MembersController@appHotIos');
+//取得最熱門的app(ios)
 Route::POST('/member/search','MembersController@search');
 //搜尋功能
 Route::GET('/member/App/{id}', 'MembersController@getApp');
 //顯示App
 Route::GET('/member/Appimg/{id}', 'MembersController@getAppimg');
 //顯示App截圖
-Route::GET('/member/App/{id}', 'MembersController@getApp');
-//顯示App
 Route::GET('/member/comment/{id}', 'MembersController@getcomment');
 //顯示評論
 Route::POST('/member/comment/{id}','MembersController@comment');
@@ -49,7 +56,12 @@ Route::PUT('/member/upcomment/{id}','MembersController@upcomment');
 //修改評論
 Route::PUT('/member/click/{id}','MembersController@click');
 //下載次數+1
-
+Route::GET('/develop/appRank/{id}', 'DevelopController@appRank');
+//開發者的App下載次數
+Route::GET('/develop/appList/{id}', 'DevelopController@appList');
+//開發者的所有App列表(含審核狀態)
+Route::GET('/develop/categories', 'DevelopController@categoryList');
+//上傳檔案畫面 - 分類列表
 
 //開發者api
 //////////////////////////////////////////////////////////////
@@ -57,12 +69,9 @@ Route::POST('/develop/Android', 'DevelopController@ApkUp');
 //開發者上傳App(apk)
 Route::POST('/develop/Ios', 'DevelopController@IosUp');
 //開發者上傳App(ios)
-Route::GET('/develop/appRank/{id}', 'DevelopController@appRank');
-//開發者的App下載次數
-Route::GET('/develop/appList/{id}', 'DevelopController@appList');
-//開發者的所有App列表(含審核狀態)
-Route::GET('/develop/categories', 'DevelopController@categoryList');
-//上傳檔案畫面 - 分類列表
+
+
+
 
 //管理者api
 //////////////////////////////////////////////////////////////

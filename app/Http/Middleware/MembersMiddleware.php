@@ -3,7 +3,7 @@
 namespace App\Http\Middleware;
 
 use Closure;
-
+use Illuminate\Support\Facades\Session;
 class MembersMiddleware
 {
     /**
@@ -15,8 +15,13 @@ class MembersMiddleware
      */
     public function handle($request, Closure $next)
     {
-       $level = Session::get('level');
-        if (Session::has('name') && $level >= 1)
+        if (Session::has('name') && Session::get('level')>=3
+        //&& Session::get('sess') == Members::where(['id', '=', Session::get('id') ->select('sess')->get()])
+        ){
             return $next($request);
+        }
+        else {
+            return response()->json(["isSuccess" => "False"]);
     }
+}
 }

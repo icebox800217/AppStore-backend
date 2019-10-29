@@ -6,6 +6,7 @@ use App\Members;
 use App\Apps;
 use App\AppImgs;
 use App\categories;
+use App\Sessions;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use App\Comments;
@@ -101,6 +102,10 @@ class MembersController extends Controller
                     session::put('name', $memberinfo->name);
                     session::put('level', $memberinfo->level);
                     session::put('icon', $memberinfo->img);
+                    $sess = time() . rand(100000, 999999);
+                    Members::where('id', $memberinfo->id)
+                    ->update(['sess' => $sess]);
+                    session::put('sess', $sess);
                     return $memberinfo;
                 } else {
                     return response()->json(["isSuccess" => "False"]);
@@ -124,11 +129,36 @@ class MembersController extends Controller
         
     }
 
-    //取得各分類app
-    public function appCategory(Request $request)
+    //取得各分類app(and)
+    public function appCategoryAnd(Request $request)
      {
          $categoryId = $request->categoryId;
          $all = Apps::where('apps.categoryId', '=', $categoryId)
+             ->where('apps.device', '=', 'android')
+             ->join('members', 'members.id', '=', 'apps.memberId')
+             ->select('apps.id', 'apps.appName', 'apps.summary', 'members.name', 'apps.created_at')
+             ->get();
+        //  $count = Apps::where('apps.categoryId', '=', $categoryId)->count();
+        //  for ($i = 0; $i < $count; $i++) {
+        //      $isnull = Comments::where('appId', '=', $i + 1)->count();
+        //      if ($isnull != 0) {
+        //          $star[$i] = Comments::where('appId', '=', $i + 1)->avg('star');
+        //      } else {
+        //          $star[$i] = '尚無評論'; 
+        //      }
+        //  }
+        foreach ($all as $key => $value) {
+            $appId = $value->id;
+            $star[] = Comments::where('appId', "=", $appId)->avg('star');
+        }
+          return response()->json(["list" => $all, "star" => $star]);
+     }
+    //取得各分類app(ios)
+    public function appCategoryIos(Request $request)
+     {
+         $categoryId = $request->categoryId;
+         $all = Apps::where('apps.categoryId', '=', $categoryId)
+             ->where('apps.device', '=', 'ios')
              ->join('members', 'members.id', '=', 'apps.memberId')
              ->select('apps.id', 'apps.appName', 'apps.summary', 'members.name', 'apps.created_at')
              ->get();
@@ -148,10 +178,10 @@ class MembersController extends Controller
           return response()->json(["list" => $all, "star" => $star]);
      }
 
-    //取得最新的app
-     public function appLast()
+    //取得最新的app(and)
+     public function appLastAnd()
      {
-        $appLast = Apps::latest('created_at')->take(20)->get();
+        $appLast = Apps::latest('created_at')->where('apps.device', '=', 'android')->take(20)->get();
         foreach ($appLast as $key => $value) {
             $appId = $value->id;
             $star[] = Comments::where('appId', "=", $appId)->avg('star');
@@ -159,10 +189,21 @@ class MembersController extends Controller
         return response()->json(["list" => $appLast, "star" => $star]);
      }
 
-    //列出最熱門的app
-     public function appHot()
+    //取得最新的app(ios)
+     public function appLastIos()
+     {
+        $appLast = Apps::latest('created_at')->where('apps.device', '=', 'ios')->take(20)->get();
+        foreach ($appLast as $key => $value) {
+            $appId = $value->id;
+            $star[] = Comments::where('appId', "=", $appId)->avg('star');
+        }
+        return response()->json(["list" => $appLast, "star" => $star]);
+     }
+
+    //列出最熱門的app(and)
+     public function appHotAnd()
      {   
-        $appHot= Apps::OrderBy('downloadTimes','desc')->take(20)->get();
+        $appHot= Apps::OrderBy('downloadTimes','desc')->where('apps.device', '=', 'android')->take(20)->get();
         foreach ($appHot as $key => $value) {
             $appId = $value->id;
             $star[] = Comments::where('appId', "=", $appId)->avg('star');
@@ -170,6 +211,19 @@ class MembersController extends Controller
         return response()->json(["list" => $appHot, "star" => $star]);
           
      }
+
+    //列出最熱門的app(ios)
+     public function appHotIos()
+     {   
+        $appHot= Apps::OrderBy('downloadTimes','desc')->where('apps.device', '=', 'ios')->take(20)->get();
+        foreach ($appHot as $key => $value) {
+            $appId = $value->id;
+            $star[] = Comments::where('appId', "=", $appId)->avg('star');
+        }
+        return response()->json(["list" => $appHot, "star" => $star]);
+          
+     }
+
     //搜尋功能
     public function search(Request $request)
     {   
